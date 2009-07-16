@@ -50,8 +50,7 @@ public class PhysicalTimeCheck {
 				BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream("NP"+i+".txt")));
 				while(br.ready()) {
 					String s=br.readLine();
-					//
-					System.out.println(s);
+					//System.out.println(s);
 					String id="";
 					long lo=0;
 					long hi=0;
@@ -95,20 +94,19 @@ public class PhysicalTimeCheck {
 		while(true) {
 			if((currentId[index]==null)&&(queue.get(index).size()>0)) {
 				currentId[index]=queue.get(index).get(0).getIntervalID();
-				//
-				System.out.println(index);
+				//System.out.println(index);
 				for(int i=0;i<numOfNormalProcess;i++) {
 					if((i!=index)&&(currentId[i]!=null)) {
 						if(!(queue.get(i).get(0).getpTimeLo()<queue.get(index).get(0).getpTimeHi())) {
 							currentId[index]=null;
 							queue.get(index).remove(0);
-							System.out.println("delete "+index);
+							//System.out.println("delete "+index);
 							break;
 						}
 						if(!(queue.get(index).get(0).getpTimeLo()<queue.get(i).get(0).getpTimeHi())) {
 							currentId[i]=null;
 							queue.get(i).remove(0);
-							System.out.println("delete "+i);
+							//System.out.println("delete "+i);
 							continue;
 						}
 					}
@@ -121,11 +119,18 @@ public class PhysicalTimeCheck {
 				}
 				System.out.println(result);
 				if(result) {
+					long hi=queue.get(0).get(0).getpTimeHi();
+					int id=0;
 					for(int i=0;i<numOfNormalProcess;i++) {
 						System.out.print(queue.get(i).get(0).getIntervalID()+" "+queue.get(i).get(0).getpTimeLo()+" "+queue.get(i).get(0).getpTimeHi()+" ");
-						queue.get(i).remove(0);
+						//queue.get(i).remove(0);
+						if(hi>queue.get(i).get(0).getpTimeHi()){ 
+							hi=queue.get(i).get(0).getpTimeHi();
+							id=i;
+						}
 						currentId[i]=null;
 					}
+					queue.get(id).remove(0);
 					System.out.println("end");
 				}
 			}
@@ -141,26 +146,6 @@ public class PhysicalTimeCheck {
 	
 	public static void main(String args[]) {
 		PhysicalTimeCheck ptc=new PhysicalTimeCheck(2);
-		try {
-			BufferedWriter bw1=new BufferedWriter(new OutputStreamWriter(new FileOutputStream("NP0.txt")));
-			bw1.write(10001+" "+10+" "+32+"\n");
-			bw1.write(10002+" "+51+" "+61+"\n");
-			bw1.write(10003+" "+81+" "+120+"\n");
-			bw1.write(10004+" "+136+" "+137+"\n");
-			bw1.flush();
-			bw1.close();
-			BufferedWriter bw2=new BufferedWriter(new OutputStreamWriter(new FileOutputStream("NP1.txt")));
-			bw2.write(20001+" "+21+" "+41+"\n");
-			bw2.write(20002+" "+71+" "+91+"\n");
-			bw2.write(20003+" "+123+" "+132+"\n");
-			bw2.write(20004+" "+135+" "+138+"\n");
-			System.out.println("trace 1");
-			bw2.flush();
-			bw2.close();
-		}
-		catch(Exception ex) {
-			System.out.println("write error "+ex);
-		}
 		ptc.read();
 		ptc.check();
 	}

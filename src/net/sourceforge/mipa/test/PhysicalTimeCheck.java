@@ -33,24 +33,32 @@ public class PhysicalTimeCheck {
 	private String[] currentId;
 	
 	private int numOfNormalProcess;
-	
+	 /**
+     * @param n the numOfNormalProcess to set
+     */
 	public PhysicalTimeCheck(int n){
 		numOfNormalProcess=n;
+		
 		queue = new ArrayList<ArrayList<PhysicalTimeInterval>>();
+		
 		currentId=new String[numOfNormalProcess];
+		
 	    for (int i = 0; i < numOfNormalProcess; i++) {
 	    	 queue.add(new ArrayList<PhysicalTimeInterval>());
 	    	 currentId[i]=null;
 	    }
 	}
 	
-	public void read() {
+	/**
+	 * @param fileList normal process file name list
+     * @read read the physical time interval of normal process from the file and store in queue
+     */
+	public void read(ArrayList<String> fileList) {
 		try {
 			for(int i=0;i<numOfNormalProcess;i++) {
-				BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream("NP"+i+".txt")));
+				BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream(fileList.get(i))));
 				while(br.ready()) {
 					String s=br.readLine();
-					//System.out.println(s);
 					String id="";
 					long lo=0;
 					long hi=0;
@@ -72,7 +80,6 @@ public class PhysicalTimeCheck {
 										hi=hi*10+s2.charAt(t)-48;
 										t++;
 									}
-									//System.out.println(id+" "+lo+" "+hi);
 								}
 							}
 							break;
@@ -81,73 +88,90 @@ public class PhysicalTimeCheck {
 					queue.get(i).add(new PhysicalTimeInterval(id,lo,hi));
 				}
 			}
-		}
-		catch(Exception ex) {
-			System.out.println(ex);
+		}catch(Exception ex) {
+			System.out.println("read from file error "+ex);
 		}
 		
 	}
 	
-	public void check() {
+	/**
+	 * @param outFileName output file name
+     * @check check out the overlap interval and output to file
+     */
+	public void check(String outFileName) {
 		boolean result=false;
 		int index=0;
-		while(true) {
-			if((currentId[index]==null)&&(queue.get(index).size()>0)) {
-				currentId[index]=queue.get(index).get(0).getIntervalID();
-				//System.out.println(index);
-				for(int i=0;i<numOfNormalProcess;i++) {
-					if((i!=index)&&(currentId[i]!=null)) {
-						if(!(queue.get(i).get(0).getpTimeLo()<queue.get(index).get(0).getpTimeHi())) {
-							currentId[index]=null;
-							queue.get(index).remove(0);
-							//System.out.println("delete "+index);
-							break;
-						}
-						if(!(queue.get(index).get(0).getpTimeLo()<queue.get(i).get(0).getpTimeHi())) {
-							currentId[i]=null;
-							queue.get(i).remove(0);
-							//System.out.println("delete "+i);
-							continue;
-						}
-					}
-				}
-				result=true;
-				for(int i=0;i<numOfNormalProcess;i++) {
-					if(currentId[i]==null) {
-						result=false;
-					}
-				}
-				System.out.println(result);
-				if(result) {
-					long hi=queue.get(0).get(0).getpTimeHi();
-					int id=0;
+		try{
+			BufferedWriter bw=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName)));
+			while(true) {
+				if((currentId[index]==null)&&(queue.get(index).size()>0)) {
+					currentId[index]=queue.get(index).get(0).getIntervalID();
 					for(int i=0;i<numOfNormalProcess;i++) {
-						System.out.print(queue.get(i).get(0).getIntervalID()+" "+queue.get(i).get(0).getpTimeLo()+" "+queue.get(i).get(0).getpTimeHi()+" ");
-						//queue.get(i).remove(0);
-						if(hi>queue.get(i).get(0).getpTimeHi()){ 
-							hi=queue.get(i).get(0).getpTimeHi();
-							id=i;
+						if((i!=index)&&(currentId[i]!=null)) {
+							if(!(queue.get(i).get(0).getpTimeLo()<queue.get(index).get(0).getpTimeHi())) {
+								currentId[index]=null;
+								queue.get(index).remove(0);
+								break;
+							}
+							if(!(queue.get(index).get(0).getpTimeLo()<queue.get(i).get(0).getpTimeHi())) {
+								currentId[i]=null;
+								queue.get(i).remove(0);
+								continue;
+							}
 						}
-						currentId[i]=null;
 					}
-					queue.get(id).remove(0);
-					System.out.println("end");
+					result=true;
+					for(int i=0;i<numOfNormalProcess;i++) {
+						if(currentId[i]==null) {
+							result=false;
+						}
+					}
+					if(result) {
+						long hi=queue.get(0).get(0).getpTimeHi();
+						int id=0;
+						for(int i=0;i<numOfNormalProcess;i++) {
+							bw.write(queue.get(i).get(0).getIntervalID()+" "+queue.get(i).get(0).getpTimeLo()+" "+queue.get(i).get(0).getpTimeHi()+" ");
+							currentId[i]=null;
+							if(hi>queue.get(i).get(0).getpTimeHi()){ 
+								hi=queue.get(i).get(0).getpTimeHi();
+								id=i;
+							}
+						}
+						queue.get(id).remove(0);
+						bw.newLine();
+						bw.flush();
+					}
 				}
+				
+				if((currentId[index]==null)&&(queue.get(index).size()==0)) {
+					bw.close();
+					return;
+				}
+				index=(index+1)%numOfNormalProcess;
 			}
-			
-			//
-			if((currentId[index]==null)&&(queue.get(index).size()==0)) {
-				System.out.println("over");
-				return;
-			}
-			index=(index+1)%numOfNormalProcess;
+		}catch(Exception ex){
+			System.out.println("output to file error "+ex);
 		}
+		
 	}
 	
 	public static void main(String args[]) {
-		PhysicalTimeCheck ptc=new PhysicalTimeCheck(2);
-		ptc.read();
-		ptc.check();
+		String normalProcessFileList="NormalProcess0.txt,NormalProcess1.txt";
+		
+		int k=0,n=1;
+		ArrayList<String> fileList=new ArrayList<String>();
+		for(int i=0;i<normalProcessFileList.length();i++) {
+			if(normalProcessFileList.charAt(i)==',') {
+				n++;
+				fileList.add(normalProcessFileList.substring(k, i));
+				k=i+1;
+			}
+		}
+		fileList.add(normalProcessFileList.substring(k));
+		
+		PhysicalTimeCheck ptc=new PhysicalTimeCheck(n);
+		ptc.read(fileList);
+		ptc.check("result.txt");
 	}
 
 }

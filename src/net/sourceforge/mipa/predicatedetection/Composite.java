@@ -22,59 +22,67 @@ package net.sourceforge.mipa.predicatedetection;
 import java.util.ArrayList;
 
 /**
- * The <code>LocalPredicate</code> class represents local predicate.
+ * @author jpyu
  *
- * @author Jianping Yu <jianp.yue@gmail.com>
  */
-public class LocalPredicate extends Atom implements Structure {
+public class Composite implements Structure {
 
-    private static final long serialVersionUID = -1765170172935638206L;
+    private ArrayList<Structure> children;
     
-    /** atoms that local predicate related */
-    private ArrayList<Atom> atoms;
+    private NodeType type;
     
-    //private String connection;
+    private String name;
     
-    public LocalPredicate() {
-        atoms = new ArrayList<Atom>();
+    public Composite(NodeType type, String name) {
+	children = new ArrayList<Structure>();
+	this.type = type;
+	this.name = name;
     }
-    
-    public Atom getAtomByName(String name) {
-        for(int i = 0; i < atoms.size(); i++) {
-            if(name.equals(atoms.get(i))) return atoms.get(i);
-        }
-        return null;
-    }
-
-    /**
-     * @return the atoms
-     */
-    public ArrayList<Atom> getAtoms() {
-        return atoms;
-    }
-    
-    public void addAtom(Atom atom) {
-        atoms.add(atom);
-    }
-
     
     @Override
     public void add(Structure child) {
 	// TODO Auto-generated method stub
+	children.add(child);
 	
     }
 
     @Override
     public ArrayList<Structure> getChildren() {
 	// TODO Auto-generated method stub
-	return null;
+	return children;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(NodeType type) {
+	this.type = type;
+    }
+
+    /**
+     * @return the type
+     */
+    public NodeType getType() {
+	return type;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+	return name;
     }
 
     @Override
     public NodeType getNodeType() {
-	// TODO Auto-generated method stub
-	return NodeType.LP;
+	return type;
     }
-    
-    
+
 }

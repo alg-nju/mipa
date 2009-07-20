@@ -19,11 +19,17 @@
  */
 package net.sourceforge.mipa.predicatedetection;
 
+import java.util.ArrayList;
+
 /**
- * predicate types.
- * 
- * @author Jianping Yu <jianp.yue@gmail.com>
+ * @author jpyu
+ *
  */
-public enum PredicateType {
-    WCP, SCP, LP, OGAP
+public interface Structure {
+    
+    public void add(Structure child);
+    
+    public ArrayList<Structure> getChildren();
+    
+    public NodeType getNodeType();
 }

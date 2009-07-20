@@ -31,24 +31,19 @@ import net.sourceforge.mipa.predicatedetection.PredicateType;
 public class Group {
     private String groupID;
 
-    private int numberOfNormalProcesses;
+    private int numberOfFinishedMembers;
 
-    private String checkerName;
-
-    private int numberOfFinishedNormalProcesses;
-
-    private PredicateType predicateType;
+    private PredicateType type;
     
-    private ArrayList<String> normalProcesses;
+    private ArrayList<String> owners;
+    
+    private ArrayList<String> members;
 
-    public Group(String groupID, String checkerName,
-                 int numberOfNormalProcesses, PredicateType type) {
-        this.groupID = groupID;
-        this.checkerName = checkerName;
-        this.numberOfFinishedNormalProcesses = 0;
-        this.numberOfNormalProcesses = numberOfNormalProcesses;
-        this.predicateType = type;
-        this.normalProcesses = new ArrayList<String>();
+    public Group(String groupID, ArrayList<String> owners, ArrayList<String> members, PredicateType type) {
+	this.groupID = groupID;
+	this.owners = owners;
+	this.setMembers(members);
+	this.type = type;
     }
 
     /**
@@ -67,73 +62,69 @@ public class Group {
     }
 
     /**
-     * @param checkerName
+     * @param owners
      *            the checkerName to set
      */
-    public void setCheckerName(String checkerName) {
-        this.checkerName = checkerName;
+    public void setOwners(ArrayList<String> owners) {
+        this.owners = owners;
     }
 
     /**
-     * @return the checkerName
+     * @return the owners
      */
-    public String getCheckerName() {
-        return checkerName;
+    public ArrayList<String> getOwners() {
+        return owners;
     }
 
     /**
-     * @param numberOfNormalProcesses
-     *            the numberOfNormalProcesses to set
+     * @param members the members to set
      */
-    public void setNumberOfNormalProcesses(int numberOfNormalProcesses) {
-        this.numberOfNormalProcesses = numberOfNormalProcesses;
+    public void setMembers(ArrayList<String> members) {
+	this.members = members;
     }
 
     /**
-     * @return the numberOfNormalProcesses
+     * @return the members
      */
-    public int getNumberOfNormalProcesses() {
-        return numberOfNormalProcesses;
+    public ArrayList<String> getMembers() {
+	return members;
     }
-
+    
     /**
      * @param numberOfFinishedNormalProcesses
      *            the numberOfFinishedNormalProcesses to set
      */
-    public void setNumberOfFinishedNormalProcesses(
-                                                   int numberOfFinishedNormalProcesses) {
-        this.numberOfFinishedNormalProcesses = numberOfFinishedNormalProcesses;
+    public void setNumberOfFinishedMembers(int numberOfFinishedMembers) {
+        this.numberOfFinishedMembers = numberOfFinishedMembers;
     }
 
     /**
-     * @return the numberOfFinishedNormalProcesses
+     * @return the numberOfFinishedMembers
      */
-    public int getNumberOfFinishedNormalProcesses() {
-        return numberOfFinishedNormalProcesses;
+    public int getNumberOfFinishedMembers() {
+        return numberOfFinishedMembers;
     }
 
     /**
      * @param predicateType
      *            the predicateType to set
      */
-    public void setPredicateType(PredicateType predicateType) {
-        this.predicateType = predicateType;
+    public void setType(PredicateType predicateType) {
+        this.type = predicateType;
     }
 
     /**
      * @return the predicateType
      */
-    public PredicateType getPredicateType() {
-        return predicateType;
+    public PredicateType getType() {
+        return type;
     }
     
-    public void addNormalProcess(String name) {
-        normalProcesses.add(name);
-    }
-    
+    /*
     public String[] getNormalProcesses() {
-        String[] list = new String[normalProcesses.size()];
-        normalProcesses.toArray(list);
+        String[] list = new String[members.size()];
+        members.toArray(list);
         return list;
     }
+    */
 }

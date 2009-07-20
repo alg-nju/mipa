@@ -20,10 +20,11 @@
 package net.sourceforge.mipa.predicatedetection;
 
 /**
- * predicate types.
- * 
- * @author Jianping Yu <jianp.yue@gmail.com>
+ * @author jpyu
+ *
  */
-public enum PredicateType {
-    WCP, SCP, LP, OGAP
+public enum NodeType {
+    GSE,
+    CGS,
+    LP
 }

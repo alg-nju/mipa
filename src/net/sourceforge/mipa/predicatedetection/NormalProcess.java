@@ -29,14 +29,9 @@ import java.rmi.RemoteException;
  */
 public interface NormalProcess extends Remote {
     /**
-     * retrieve information from coordinator.
-     * 
-     * @param normalProcessesList
-     *            normal processes' name list
-     * @param checker
-     *            the checker's name
+     * initialization finished.
+     *
      * @throws RemoteException
      */
-    public void retrieveInformation(String[] normalProcessesList, String checker)
-                                                                                 throws RemoteException;
+    public void finished() throws RemoteException;
 }

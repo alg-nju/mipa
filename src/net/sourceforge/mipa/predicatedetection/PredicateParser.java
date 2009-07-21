@@ -69,13 +69,70 @@ public class PredicateParser implements PredicateParserMethod {
             parseOGAPStructure(null, predicateStructure);
         else if(type == PredicateType.SCP)
             parseSCPStructure(predicateStructure);
+        else {
+            System.out.println("This predicate type have not been implemented yet.");
+        }
 
         //checkerParser.parseChecker(predicate, applicationName, type);
     }
     
+    
+    /**
+     * 
+     * @param s
+     */
     private void parseSCPStructure(Structure s) {
+	ArrayList<Structure> children = s.getChildren();
 	
+	if(s.getNodeType() == NodeType.GSE) {
+	    for(int i = 0; i < children.size(); i++) {
+		parseSCPStructure(children.get(i));
+	    }
+	} else if(s.getNodeType() == NodeType.CGS) {
+	    IDManager idManager = MIPAResource.getIDManager();
+	    String owner = null;
+	    try {
+		owner = idManager.getID(Catalog.Checker);
+	    } catch(Exception e) {
+		e.printStackTrace();
+	    }
+	    
+	    ArrayList<String> owners = new ArrayList<String>();
+	    ArrayList<String> members = new ArrayList<String>();
+	    Map<String, LocalPredicate> mapping = new HashMap<String, LocalPredicate>();
+	    
+	    owners.add(owner);
+	    for(int i = 0; i < children.size(); i++) {
+		Structure unit = children.get(i);
+		
+		assert(unit.getNodeType() == NodeType.LP);
+		String memberID = null;
+		try {
+		    memberID = idManager.getID(Catalog.NormalProcess);
+		} catch(Exception e) {
+		    e.printStackTrace();
+		}
+		members.add(memberID);
+		mapping.put(memberID, (LocalPredicate) s);
+	    }
+	    String groupID = null;
+	    try {
+		groupID = idManager.getID(Catalog.Group);
+	    } catch(Exception e) {
+		e.printStackTrace();
+	    }
+	    Group g = new Group(groupID, owners, members, PredicateType.SCP);
+	    
+	    
+	}
     }
+    
+    
+    /**
+     * 
+     * @param fatherID
+     * @param s
+     */
     
     private void parseOGAPStructure(String fatherID, Structure s) {
 	
@@ -96,7 +153,7 @@ public class PredicateParser implements PredicateParserMethod {
 	if(s.getNodeType() == NodeType.GSE) {
 	    assert(fatherID == null);
 
-	    // create GSE checker.
+	    // create GSE checker, and bind to rmi registry
 	
 	    
 	    // parser the others
@@ -142,7 +199,11 @@ public class PredicateParser implements PredicateParserMethod {
 	    
 	    // register each local predicate.
 	    
-	    
+	    for(int i = 0; i < members.size(); i++) {
+		LocalPredicate LP = mapping.get(members.get(i));
+		//FIND THE ECA MANAGER ID. 直接传递group
+		
+	    }
 	    
 	} else {
 	    assert(false);

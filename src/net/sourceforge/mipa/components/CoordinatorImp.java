@@ -20,16 +20,14 @@
 package net.sourceforge.mipa.components;
 
 import static config.Debug.DEBUG;
+
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.mipa.naming.Catalog;
-import net.sourceforge.mipa.naming.IDManager;
 import net.sourceforge.mipa.naming.Naming;
-import net.sourceforge.mipa.predicatedetection.CheckerFactory;
 import net.sourceforge.mipa.predicatedetection.NormalProcess;
-import net.sourceforge.mipa.predicatedetection.PredicateType;
 
 /**
  * 
@@ -40,71 +38,53 @@ public class CoordinatorImp implements Coordinator {
     private Map<String, Group> groupMap;
 
     private Naming server;
-    private IDManager idManager;
 
     public CoordinatorImp() {
         groupMap = new HashMap<String, Group>();
 
         try {
             server = MIPAResource.getNamingServer();
-            idManager = MIPAResource.getIDManager();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public synchronized void normalProcessFinished(String groupID,
-                                                   String normalProcessID)
-                                                                          throws RemoteException {
-        assert (groupMap.containsKey(groupID));
-        
-        Group g = groupMap.get(groupID);
-        int finishedNum = g.getNumberOfFinishedNormalProcesses();
-        int total = g.getNumberOfNormalProcesses();
-        
-        assert(finishedNum < total);
-        
-        finishedNum++;
-        g.setNumberOfFinishedNormalProcesses(finishedNum);
-        
-        if(DEBUG) {
-            System.out.println("Coordinator receive normal process name: " + normalProcessID);
-        }
-        g.addNormalProcess(normalProcessID);
-        
-        if(finishedNum == total) {
-            // create checker
-            PredicateType type = g.getPredicateType();
-            String[] normalProcesses = g.getNormalProcesses();
-            String checker = g.getCheckerName();
-            
-            if(DEBUG) {
-                System.out.println("new checker in coordinator...");
-                System.out.println("type is " + type);
-            }
-            CheckerFactory.newChecker(groupID, checker, normalProcesses, type);
-            for(int i = 0; i < normalProcesses.length; i++) {
-                try {
-                    NormalProcess np = (NormalProcess) server.lookup(normalProcesses[i]);
-                    np.retrieveInformation(normalProcesses, checker);
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-                
-            }
-        }
+    public synchronized void memberFinished(String groupID, String memberID)
+	    throws RemoteException {
+	// TODO Auto-generated method stub
+	assert(groupMap.containsKey(groupID));
+	
+	Group g = groupMap.get(groupID);
+	int finishedNum = g.getNumberOfFinishedMembers();
+	int total = g.getMembers().size();
+	
+	assert(finishedNum < total);
+	
+	finishedNum++;
+	g.setNumberOfFinishedMembers(finishedNum);
+	
+	if(DEBUG) {
+	    System.out.println("Coordinator receives normal process name: " + memberID);
+	}
+	
+	if(finishedNum == total) {
+	    ArrayList<String> members = g.getMembers();
+	    for(int i = 0; i < members.size(); i++) {
+		try {
+		    NormalProcess np = (NormalProcess) server.lookup(members.get(i));
+		    np.finished();
+		} catch(Exception e) {
+		    e.printStackTrace();
+		}
+	    }
+	}
     }
 
     @Override
-    public synchronized void newCoordinator(String groupID,
-                                            int numberOfNormalProcesses,
-                                            PredicateType type)
-                                                               throws RemoteException {
-        assert (groupMap.containsKey(groupID) == false);
-
-        Group g = new Group(groupID, idManager.getID(Catalog.Checker),
-                            numberOfNormalProcesses, type);
-        groupMap.put(groupID, g);
+    public synchronized void newCoordinator(Group g) throws RemoteException {
+	
+	assert(groupMap.containsKey(g.getGroupID()) == false);
+	groupMap.put(g.getGroupID(), g);
     }
 }

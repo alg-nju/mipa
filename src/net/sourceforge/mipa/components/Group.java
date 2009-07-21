@@ -19,6 +19,7 @@
  */
 package net.sourceforge.mipa.components;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import net.sourceforge.mipa.predicatedetection.PredicateType;
@@ -28,7 +29,10 @@ import net.sourceforge.mipa.predicatedetection.PredicateType;
  * 
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
-public class Group {
+public class Group implements Serializable {
+
+    private static final long serialVersionUID = -5628035618721334545L;
+
     private String groupID;
 
     private int numberOfFinishedMembers;
@@ -42,7 +46,7 @@ public class Group {
     public Group(String groupID, ArrayList<String> owners, ArrayList<String> members, PredicateType type) {
 	this.groupID = groupID;
 	this.owners = owners;
-	this.setMembers(members);
+	this.members = members;
 	this.type = type;
     }
 
@@ -119,12 +123,4 @@ public class Group {
     public PredicateType getType() {
         return type;
     }
-    
-    /*
-    public String[] getNormalProcesses() {
-        String[] list = new String[members.size()];
-        members.toArray(list);
-        return list;
-    }
-    */
 }

@@ -133,7 +133,8 @@ public class PhysicalTimeCheck {
 						long hi=queue.get(0).get(0).getpTimeHi();
 						int id=0;
 						for(int i=0;i<numOfNormalProcess;i++) {
-							bw.write(queue.get(i).get(0).getIntervalID()+" "+queue.get(i).get(0).getpTimeLo()+" "+queue.get(i).get(0).getpTimeHi()+" ");
+						    	String end = i + 1 == numOfNormalProcess ? "\n" : " ";
+							bw.write(queue.get(i).get(0).getIntervalID()+" "+queue.get(i).get(0).getpTimeLo()+" "+queue.get(i).get(0).getpTimeHi()+end);
 							currentId[i]=null;
 							if(hi>queue.get(i).get(0).getpTimeHi()){ 
 								hi=queue.get(i).get(0).getpTimeHi();
@@ -141,7 +142,7 @@ public class PhysicalTimeCheck {
 							}
 						}
 						queue.get(id).remove(0);
-						bw.newLine();
+						//bw.newLine();
 						bw.flush();
 					}
 				}
@@ -159,7 +160,7 @@ public class PhysicalTimeCheck {
 	}
 	
 	public static void main(String args[]) {
-		String normalProcessFileList="NormalProcess0.txt,NormalProcess1.txt";
+		String normalProcessFileList="log/NormalProcess0,log/NormalProcess1";
 		
 		int k=0,n=1;
 		ArrayList<String> fileList=new ArrayList<String>();
@@ -174,7 +175,7 @@ public class PhysicalTimeCheck {
 		
 		PhysicalTimeCheck ptc=new PhysicalTimeCheck(n);
 		ptc.read(fileList);
-		ptc.check("result.txt");
+		ptc.check("log/result.txt");
 	}
 
 }

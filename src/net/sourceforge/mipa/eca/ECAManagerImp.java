@@ -27,9 +27,8 @@ import java.util.ArrayList;
 
 import net.sourceforge.mipa.components.ContextRegister;
 import net.sourceforge.mipa.components.Coordinator;
+import net.sourceforge.mipa.components.Group;
 import net.sourceforge.mipa.components.MIPAResource;
-import net.sourceforge.mipa.naming.Catalog;
-import net.sourceforge.mipa.naming.IDManager;
 import net.sourceforge.mipa.naming.Naming;
 import net.sourceforge.mipa.predicatedetection.LocalPredicate;
 import net.sourceforge.mipa.predicatedetection.NormalProcess;
@@ -94,43 +93,47 @@ public class ECAManagerImp implements ECAManager {
         return contextRegister;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * net.sourceforge.mipa.eca.ECAManager#registerLocalPredicate(net.sourceforge
-     * .mipa.predicatedetection.LocalPredicate, java.lang.String)
-     */
     @Override
-    public void registerLocalPredicate(LocalPredicate localPredicate,
-                                       String groupId, PredicateType type)
-                                                                          throws RemoteException {
-        // new listener and condition
-        // TODO listener should be Normal process and remove lookup to construction.
-        
-        try {
-            Naming server = MIPAResource.getNamingServer();
-        
-            IDManager idManger = MIPAResource.getIDManager();
-            
-            Coordinator coordinator = MIPAResource.getCoordinator();
-            
-            String npName = idManger.getID(Catalog.NormalProcess);
-            
-            if(DEBUG) {
-                System.out.println("Get normal process name: " + npName);
-            }
-        
-            SCPNormalProcess np = new SCPNormalProcess(npName);
-            NormalProcess npStub = (NormalProcess) UnicastRemoteObject.exportObject(np, 0);
-            
-            server.bind(npName, npStub);
-            coordinator.normalProcessFinished(groupId, npName);
-        
+    public void registerLocalPredicate(LocalPredicate localPredicate, String name, Group g)
+	    throws RemoteException {
+	try {
+	    Naming server = MIPAResource.getNamingServer();
+	    
+	    Coordinator coordinator = MIPAResource.getCoordinator();
+	    
+	    if(DEBUG) {
+		System.out.println("Get normal process: " + name);
+	    }
+	    
+	    String[] checkers = new String[g.getOwners().size()];
+	    String[] normalProcesses = new String[g.getMembers().size()];
+	    g.getOwners().toArray(checkers);
+	    g.getMembers().toArray(normalProcesses);
+	    
+	    Listener action = null;
+	    NormalProcess npStub = null;
+	    if(g.getType() == PredicateType.SCP) {
+		SCPNormalProcess np = new SCPNormalProcess(name,checkers,normalProcesses);
+		npStub = (NormalProcess) UnicastRemoteObject.exportObject(np, 0);
+		action = np;
+	    } else if(g.getType() == PredicateType.OGAP) {
+		
+	    } else if(g.getType() == PredicateType.WCP) {
+		
+	    } else if(g.getType() == PredicateType.LP) {
+		
+	    } else {
+		
+	    }
+	    
+	    server.bind(name, npStub);
+	    coordinator.memberFinished(g.getGroupID(), name);
+	    
             if(DEBUG) {
                 System.out.println("before binding condition...");
             }
-            Condition everything = new EmptyCondition(np, localPredicate);
+            
+            Condition everything = new EmptyCondition(action, localPredicate);
             
             if(DEBUG) {
                 System.out.println("after binding condition...");
@@ -148,9 +151,10 @@ public class ECAManagerImp implements ECAManager {
             if(DEBUG) {
                 System.out.println("binding condition to data source successful.");
             }
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+	} catch(Exception e) {
+	    e.printStackTrace();
+	}
+	
     }
 
     /**

@@ -32,4 +32,6 @@ public interface Structure {
     public ArrayList<Structure> getChildren();
     
     public NodeType getNodeType();
+    
+    public LocalPredicate getLocalPredicate();
 }

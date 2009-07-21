@@ -54,8 +54,12 @@ public class SCPNormalProcess extends AbstractNormalProcess {
     /**
      * @param name
      */
-    public SCPNormalProcess(String name) {
-        super(name);
+    public SCPNormalProcess(String name, String[] checkers, String[] normalProcesses) {
+        super(name, checkers, normalProcesses);
+        
+        currentClock = new SCPVectorClock(normalProcesses.length);
+        currentClock.increment(id);
+        
         // TODO Auto-generated constructor stub
         currentState = false;
         firstflag = true;
@@ -111,7 +115,10 @@ public class SCPNormalProcess extends AbstractNormalProcess {
                     }
                 }
                 //SCP doesn't send any message to other normal processes.
-                send(MessageType.Detection, checker, content);
+                for(int i = 0; i < checkers.length; i++) {
+                    String checker = checkers[i];
+                    send(MessageType.Detection, checker, content);
+                }
             }
             currentState = value;
         }
@@ -135,9 +142,9 @@ public class SCPNormalProcess extends AbstractNormalProcess {
     }
     
     private void broadcast(MessageType type, SCPMessageContent content) {
-        for(int i = 0; i < normalProcessesList.length; i++) {
+        for(int i = 0; i < normalProcesses.length; i++) {
             if(i != id) {
-                send(type, normalProcessesList[i], content);
+                send(type, normalProcesses[i], content);
             }
         }
     }

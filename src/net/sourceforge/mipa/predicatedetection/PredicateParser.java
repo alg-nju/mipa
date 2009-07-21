@@ -27,10 +27,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sourceforge.mipa.components.ContextMapping;
+import net.sourceforge.mipa.components.Coordinator;
 import net.sourceforge.mipa.components.Group;
 import net.sourceforge.mipa.components.MIPAResource;
+import net.sourceforge.mipa.eca.ECAManager;
 import net.sourceforge.mipa.naming.Catalog;
 import net.sourceforge.mipa.naming.IDManager;
+import net.sourceforge.mipa.naming.Naming;
 
 import org.w3c.dom.Document;
 
@@ -45,24 +48,29 @@ public class PredicateParser implements PredicateParserMethod {
 
     /** checker logic parser reference */
     //private CheckerParser checkerParser;
+    
+    private ContextMapping contextMapping;
 
+    private String callback;
+    
     /**
      * default construction.
      */
     public PredicateParser(ContextMapping contextMapping) {
-        structureParser = new StructureParser(contextMapping);
+        structureParser = new StructureParser();
+        this.contextMapping = contextMapping;
         //checkerParser = new CheckerParser();
     }
 
-    public void parsePredicate(String applicationName, Document predicate)
+    public synchronized void parsePredicate(String applicationName, Document predicate)
                                                                           throws RemoteException {
 
         if (DEBUG) {
             System.out.println("parsing predicate...");
         }
+        this.callback = applicationName;
 
         PredicateType type = PredicateIdentify.predicateIdentify(predicate);
-        
 
         Structure predicateStructure = structureParser.parseStructure(predicate);
         if(type == PredicateType.OGAP)
@@ -113,7 +121,7 @@ public class PredicateParser implements PredicateParserMethod {
 		    e.printStackTrace();
 		}
 		members.add(memberID);
-		mapping.put(memberID, (LocalPredicate) s);
+		mapping.put(memberID, (LocalPredicate) unit);
 	    }
 	    String groupID = null;
 	    try {
@@ -121,9 +129,26 @@ public class PredicateParser implements PredicateParserMethod {
 	    } catch(Exception e) {
 		e.printStackTrace();
 	    }
+	    // create group for CGS
 	    Group g = new Group(groupID, owners, members, PredicateType.SCP);
 	    
+	    Coordinator coordinator = MIPAResource.getCoordinator();
+	    try {
+		coordinator.newCoordinator(g);
+	    } catch(Exception e) {
+		e.printStackTrace();
+	    }
+	    // create CGS checker.
+	    String checkerName = g.getOwners().get(0);
+	    String[] normalProcesses = new String[g.getMembers().size()];
+	    g.getMembers().toArray(normalProcesses);
+	    CheckerFactory.newChecker(callback, checkerName, normalProcesses, g.getType());
 	    
+	    // create Normal Processes.
+	    for(int i = 0; i < members.size(); i++) {
+		LocalPredicate lp = mapping.get(members.get(i));
+		registerLocalPredicate(lp, members.get(i), g);
+	    }
 	}
     }
     
@@ -184,7 +209,7 @@ public class PredicateParser implements PredicateParserMethod {
 		    e.printStackTrace();
 		}
 		members.add(memberID);
-		mapping.put(memberID, (LocalPredicate) s);
+		mapping.put(memberID, (LocalPredicate) unit);
 	   
 	    }
 	    String groupID = null;
@@ -207,6 +232,22 @@ public class PredicateParser implements PredicateParserMethod {
 	    
 	} else {
 	    assert(false);
+	}
+    }
+    
+    private void registerLocalPredicate(LocalPredicate lp, String name, Group g) {
+	try {
+	    String ecaManagerID = contextMapping.getEntityId(lp.getName());
+	    lp.setValueType(contextMapping.getValueType(lp.getName()));
+	    
+	    Naming server = MIPAResource.getNamingServer();
+	    ECAManager ecaManager = (ECAManager) server.lookup(ecaManagerID);
+	    
+            System.out.println("find eca manager successfully.");
+            System.out.println(ecaManagerID);
+            ecaManager.registerLocalPredicate(lp, name, g);
+	} catch(Exception e) {
+	    e.printStackTrace();
 	}
     }
 }

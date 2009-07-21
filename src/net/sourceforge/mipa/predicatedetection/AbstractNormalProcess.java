@@ -29,7 +29,6 @@ import net.sourceforge.mipa.components.MIPAResource;
 import net.sourceforge.mipa.components.Message;
 import net.sourceforge.mipa.components.MessageDispatcher;
 import net.sourceforge.mipa.eca.Listener;
-import net.sourceforge.mipa.predicatedetection.scp.SCPVectorClock;
 
 /**
  * abstract normal process.
@@ -47,9 +46,9 @@ public abstract class AbstractNormalProcess implements Serializable, Runnable,
     /** id of normal process */
     protected int id;
 
-    protected String[] normalProcessesList;
+    protected String[] normalProcesses;
 
-    protected String checker;
+    protected String[] checkers;
 
     /** the vector clock of normal process */
     protected VectorClock currentClock;
@@ -58,9 +57,18 @@ public abstract class AbstractNormalProcess implements Serializable, Runnable,
 
     protected MessageDispatcher messageDispatcher;
 
-    public AbstractNormalProcess(String name) {
+    public AbstractNormalProcess(String name, String[] checkers, String[] normalProcesses) {
+	this.checkers = checkers;
+	this.normalProcesses = normalProcesses;
         this.name = name;
         finished = false;
+        
+        for (int i = 0; i < normalProcesses.length; i++) {
+            if (normalProcesses[i].equals(name)) {
+                this.id = i;
+                break;
+            }
+        }
 
         try {
             messageDispatcher = MIPAResource.getMessageDispatcher();
@@ -74,9 +82,9 @@ public abstract class AbstractNormalProcess implements Serializable, Runnable,
 
     
     public void receive(Message message) throws RemoteException {
-        if(finished) {
-            receiveMsg(message);
-        }
+        //if(finished) {
+        receiveMsg(message);
+        //}
     }
     
     public void update(String eventName, String value) {
@@ -101,26 +109,9 @@ public abstract class AbstractNormalProcess implements Serializable, Runnable,
     public abstract void application();
 
     @Override
-    public void retrieveInformation(String[] normalProcessesList, String checker) {
-        for (int i = 0; i < normalProcessesList.length; i++) {
-            if (normalProcessesList[i].equals(name)) {
-                id = i;
-                break;
-            }
-        }
-        this.normalProcessesList = normalProcessesList;
-        this.checker = checker;
-        // initial its vector clock to 1
-        
-        //FIXME initialization should not be here
-        //----------------------------------------------
-        currentClock = new SCPVectorClock(normalProcessesList.length);
-        currentClock.increment(id);
-        //----------------------------------------------
-        finished = true;
-        
-        // run application thread
-        Thread t = new Thread(this);
-        t.start();
+    public void finished() {
+	finished = true;
+	Thread t = new Thread(this);
+	t.start();
     }
 }

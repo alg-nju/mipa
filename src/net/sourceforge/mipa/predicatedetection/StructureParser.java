@@ -19,8 +19,6 @@
  */
 package net.sourceforge.mipa.predicatedetection;
 
-import net.sourceforge.mipa.components.ContextMapping;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -33,15 +31,17 @@ import org.w3c.dom.NodeList;
 public class StructureParser {
 
     /** context mapping */
-    private ContextMapping contextMapping;
+    //private ContextMapping contextMapping;
     
     public StructureParser() {
 	System.out.println("Testing constructor of STRUCTUREPARSER.");
     }
 
+    /*
     public StructureParser(ContextMapping contextMapping) {
 	this.contextMapping = contextMapping;
     }
+    */
 
     /**
      * parse structure of predicate from <code>Document</code>.
@@ -104,12 +104,13 @@ public class StructureParser {
 				LP.setOperator(operator);
 				LP.setName(name);
 				LP.setValue(value);
+				/*
 				try {
 				    LP.setValueType(contextMapping.getValueType(LP.getName()));
 				} catch(Exception e) {
 				    e.printStackTrace();
 				}
-				
+				*/
 			    } // :end if
 			} // :end if
 		    } // :end for

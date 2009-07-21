@@ -84,11 +84,4 @@ public class Composite implements Structure {
     public NodeType getNodeType() {
 	return type;
     }
-
-    @Override
-    public LocalPredicate getLocalPredicate() {
-	
-	return null;
-    }
-
 }

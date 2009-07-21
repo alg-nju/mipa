@@ -75,12 +75,4 @@ public class LocalPredicate extends Atom implements Structure {
 	// TODO Auto-generated method stub
 	return NodeType.LP;
     }
-
-    @Override
-    public LocalPredicate getLocalPredicate() {
-	// TODO Auto-generated method stub
-	return this;
-    }
-    
-    
 }

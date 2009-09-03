@@ -192,6 +192,14 @@ public class ConcurrentIntervalExtract {
 											smallestHi));
 							bwc.write("id " + largestLo + " " + smallestHi + "\n");
 							bwc.flush();
+							
+							for (int i = 0; i < number; i++) {
+								String end = i + 1 == number ? "\n" : " ";
+								bw.write(queue.get(i).get(0).getIntervalID() + " "
+										+ queue.get(i).get(0).getpTimeLo() + " "
+										+ queue.get(i).get(0).getpTimeHi() + end);
+								
+							}
 						}
 						
 						/*sequence.get(id).add(
@@ -201,10 +209,6 @@ public class ConcurrentIntervalExtract {
 						bwc.flush();
 						*/
 						for (int i = 0; i < number; i++) {
-							String end = i + 1 == number ? "\n" : " ";
-							bw.write(queue.get(i).get(0).getIntervalID() + " "
-									+ queue.get(i).get(0).getpTimeLo() + " "
-									+ queue.get(i).get(0).getpTimeHi() + end);
 							queue.get(i).remove(0);
 							currentId[i] = null;
 						}

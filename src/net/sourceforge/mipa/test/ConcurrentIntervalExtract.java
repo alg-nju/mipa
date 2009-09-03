@@ -176,8 +176,7 @@ public class ConcurrentIntervalExtract {
 					if (result) {
 						long largestLo = queue.get(0).get(0).getpTimeLo();
 						long smallestHi = queue.get(0).get(0).getpTimeHi();
-						queue.get(0).remove(0);
-						currentId[0] = null;
+						
 						for (int i = 1; i < number; i++) {
 							if (largestLo < queue.get(i).get(0).getpTimeLo()) {
 								largestLo = queue.get(i).get(0).getpTimeLo();
@@ -185,19 +184,29 @@ public class ConcurrentIntervalExtract {
 							if (smallestHi > queue.get(i).get(0).getpTimeHi()) {
 								smallestHi = queue.get(i).get(0).getpTimeHi();
 							}
-							queue.get(i).remove(0);
-							currentId[i] = null;
 						}
-						sequence.get(id).add(
+						
+						if(smallestHi-largestLo>1000){
+							sequence.get(id).add(
+									new PhysicalTimeInterval(" ", largestLo,
+											smallestHi));
+							bwc.write("id " + largestLo + " " + smallestHi + "\n");
+							bwc.flush();
+						}
+						
+						/*sequence.get(id).add(
 								new PhysicalTimeInterval(" ", largestLo,
 										smallestHi));
 						bwc.write("id " + largestLo + " " + smallestHi + "\n");
 						bwc.flush();
+						*/
 						for (int i = 0; i < number; i++) {
 							String end = i + 1 == number ? "\n" : " ";
 							bw.write(queue.get(i).get(0).getIntervalID() + " "
 									+ queue.get(i).get(0).getpTimeLo() + " "
 									+ queue.get(i).get(0).getpTimeHi() + end);
+							queue.get(i).remove(0);
+							currentId[i] = null;
 						}
 						bw.flush();
 					}

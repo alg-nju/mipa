@@ -20,138 +20,119 @@
 
 package net.sourceforge.mipa.test;
 
+import static config.Debug.DEBUG;
 import java.util.*;
 import java.io.*;
 
+/**
+ * extract the concurrent interval and output to file
+ * 
+ * @author Tingting Hua <huatingting0820@gmail.com>
+ *
+ */
 public class ConcurrentIntervalExtract {
 
+	/** store the interval information of all normal processes*/
+	private ArrayList<ArrayList<PhysicalTimeInterval>> queue;
+
+	/** the array of concurrent checker name */
+	private String[] checkerArray;
+
+	/** the array of normal process name*/
+	private String[] fileArray;
+
+	/** number of concurrent checker*/
 	private int numOfChecker;
 
+	/** element is the number of normal process of each concurrent checker*/
 	private int[] numOfFile;
 
-	private ArrayList<ArrayList<String>> fileArrayList;
+	/** element is the ID of normal process of each concurrent checker*/
+	private ArrayList<ArrayList<Integer>> fileArrayList;
 
+	/** store the concurrent interval information of groups of processes*/
 	private ArrayList<ArrayList<PhysicalTimeInterval>> sequence;
 
 	/**
+	 * constructor
 	 * 
-	 * @param n
+	 * @param checkerList the string list of checker name
+	 * @param fileList the string list of normal process name
 	 */
-	public ConcurrentIntervalExtract(int n) {
+	public ConcurrentIntervalExtract(String checkerList, String fileList) {
 
-		numOfChecker = n;
-		numOfFile = new int[n];
-		fileArrayList = new ArrayList<ArrayList<String>>();
+		checkerArray = checkerList.split(",");
+
+		fileArray = fileList.split(",");
+
+		numOfChecker = checkerArray.length;
+
+		numOfFile = new int[checkerArray.length];
+
+		queue = new ArrayList<ArrayList<PhysicalTimeInterval>>();
+
+		fileArrayList = new ArrayList<ArrayList<Integer>>();
+
 		sequence = new ArrayList<ArrayList<PhysicalTimeInterval>>();
 
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < checkerArray.length; i++) {
 			numOfFile[i] = 0;
-			fileArrayList.add(new ArrayList<String>());
+			fileArrayList.add(new ArrayList<Integer>());
 			sequence.add(new ArrayList<PhysicalTimeInterval>());
 		}
-
-	}
-
-	/**
-	 * separate the file according to checker information and store the result
-	 * in fileArrayList
-	 * 
-	 * @param checkerArrayList
-	 *            the name list of checker
-	 * @param fileList
-	 *            the name list of all normal process
-	 */
-	public void partition(ArrayList<String> checkerArrayList, String fileList) {
-
-		try {
-			int k = 0;
-			for (int i = 0; i < fileList.length(); i++) {
-				if (fileList.charAt(i) == ',') {
-					String s = fileList.substring(k, i);
-					BufferedReader br = new BufferedReader(
-							new InputStreamReader(new FileInputStream(s)));
-					String name = br.readLine();
-					for (int j = 0; j < numOfChecker; j++) {
-						if (name.compareTo(checkerArrayList.get(j)) == 0) {
-							fileArrayList.get(j).add(s);
-							numOfFile[j]++;
-						}
-					}
-					k = i + 1;
-				}
-			}
-			String s = fileList.substring(k);
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream(s)));
-			String name = br.readLine();
-			for (int j = 0; j < numOfChecker; j++) {
-				if (name.compareTo(checkerArrayList.get(j)) == 0) {
-					fileArrayList.get(j).add(s);
-					numOfFile[j]++;
-				}
-			}
-		} catch (Exception ex) {
-			System.out.println("file read error! " + ex);
+		for (int i = 0; i < fileArray.length; i++) {
+			queue.add(new ArrayList<PhysicalTimeInterval>());
 		}
 
 	}
 
 	/**
+	 * read the interval information of all normal processes form the file
 	 * 
-	 * @param fileList
-	 * @param num
-	 * @param array
 	 */
-	public void read(ArrayList<String> fileList, int num,
-			ArrayList<ArrayList<PhysicalTimeInterval>> array) {
+	public void readfile() {
 		try {
-			for (int i = 0; i < num; i++) {
+			for (int i = 0; i < fileArray.length; i++) {
 				BufferedReader br = new BufferedReader(new InputStreamReader(
-						new FileInputStream(fileList.get(i))));
-				while (br.ready()) {
-					String s = br.readLine();
-					String id = "";
-					long lo = 0;
-					long hi = 0;
-					for (int j = 0; j < s.length(); j++) {
-						if (s.charAt(j) == ' ') {
-							id = s.substring(0, j);
-							s = s.substring(j + 1);
-							for (int k = 0; k < s.length(); k++) {
-								if (s.charAt(k) == ' ') {
-									String s1 = s.substring(0, k);
-									String s2 = s.substring(k + 1);
-									int t = 0;
-									while (t < s1.length()) {
-										lo = lo * 10 + s1.charAt(t) - 48;
-										t++;
-									}
-									t = 0;
-									while (t < s2.length()) {
-										hi = hi * 10 + s2.charAt(t) - 48;
-										t++;
-									}
-								}
-							}
-							break;
-						}
-					}
-					array.get(i).add(new PhysicalTimeInterval(id, lo, hi));
+						new FileInputStream(fileArray[i])));
+				if (DEBUG) {
+					System.out.println("open file " + fileArray[i]);
 				}
+				
+				String checkerName = br.readLine();
+				for (int j = 0; j < numOfChecker; j++) {
+					if (checkerName.compareTo(checkerArray[j]) == 0) {
+						fileArrayList.get(j).add(new Integer(i));
+						numOfFile[j]++;
+					}
+				}
+				
+				String s = null;
+				while ((s = br.readLine()) != null) {
+					if (DEBUG) {
+						System.out.println(s);
+					}
+					String[] str = s.split(" ");
+					long lo = Long.valueOf(str[1]);
+					long hi = Long.valueOf(str[2]);
+					queue.get(i).add(new PhysicalTimeInterval(str[0], lo, hi));
+				}
+				if (DEBUG) {
+					System.out.println("success " + i + " process");
+				}
+				br.close();
 			}
 		} catch (Exception ex) {
-			System.out.println("read from file error " + ex);
+			System.out.println("read file error! " + ex);
 		}
-
 	}
 
 	/**
-	 * comtpute the overlap interval sequence from the queue and store in
-	 * sequence
+	 * compute the concurrent interval from a group of normal processes
 	 * 
-	 * @param queue
-	 * @param number
-	 * @param id
+	 * @param queue the interval information of the group
+	 * @param number the number of normal process of the group
+	 * @param id the ID of the group
 	 */
 	public void getIntersection(
 			ArrayList<ArrayList<PhysicalTimeInterval>> queue, int number, int id) {
@@ -161,115 +142,121 @@ public class ConcurrentIntervalExtract {
 		}
 		boolean result = false;
 		int index = 0;
-		while (queue.get(index).size() > 0) {
-			if ((currentId[index] == null) && (queue.get(index).size() > 0)) {
-				currentId[index] = queue.get(index).get(0).getIntervalID();
-				for (int i = 0; i < number; i++) {
-					if ((i != index) && (currentId[i] != null)) {
-						if (!(queue.get(i).get(0).getpTimeLo() < queue.get(
-								index).get(0).getpTimeHi())) {
-							currentId[index] = null;
-							queue.get(index).remove(0);
-							break;
-						}
-						if (!(queue.get(index).get(0).getpTimeLo() < queue.get(
-								i).get(0).getpTimeHi())) {
-							currentId[i] = null;
-							queue.get(i).remove(0);
-							continue;
+		try {
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(checkerArray[id])));
+			BufferedWriter bwc = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(checkerArray[id] + "interval")));
+			while (queue.get(index).size() > 0) {
+				if ((currentId[index] == null) && (queue.get(index).size() > 0)) {
+					currentId[index] = queue.get(index).get(0).getIntervalID();
+					for (int i = 0; i < number; i++) {
+						if ((i != index) && (currentId[i] != null)) {
+							if (!(queue.get(i).get(0).getpTimeLo() < queue.get(
+									index).get(0).getpTimeHi())) {
+								currentId[index] = null;
+								queue.get(index).remove(0);
+								break;
+							}
+							if (!(queue.get(index).get(0).getpTimeLo() < queue
+									.get(i).get(0).getpTimeHi())) {
+								currentId[i] = null;
+								queue.get(i).remove(0);
+								continue;
+							}
 						}
 					}
-				}
-				result = true;
-				for (int i = 0; i < number; i++) {
-					if (currentId[i] == null) {
-						result = false;
+					result = true;
+					for (int i = 0; i < number; i++) {
+						if (currentId[i] == null) {
+							result = false;
+						}
 					}
-				}
 
-				if (result) {
-					long largestLo = queue.get(0).get(0).getpTimeLo();
-					long smallestHi = queue.get(0).get(0).getpTimeHi();
-					queue.get(0).remove(0);
-					currentId[0] = null;
-					for (int i = 1; i < number; i++) {
-						if (largestLo < queue.get(i).get(0).getpTimeLo()) {
-							largestLo = queue.get(i).get(0).getpTimeLo();
+					if (result) {
+						long largestLo = queue.get(0).get(0).getpTimeLo();
+						long smallestHi = queue.get(0).get(0).getpTimeHi();
+						queue.get(0).remove(0);
+						currentId[0] = null;
+						for (int i = 1; i < number; i++) {
+							if (largestLo < queue.get(i).get(0).getpTimeLo()) {
+								largestLo = queue.get(i).get(0).getpTimeLo();
+							}
+							if (smallestHi > queue.get(i).get(0).getpTimeHi()) {
+								smallestHi = queue.get(i).get(0).getpTimeHi();
+							}
+							queue.get(i).remove(0);
+							currentId[i] = null;
 						}
-						if (smallestHi > queue.get(i).get(0).getpTimeHi()) {
-							smallestHi = queue.get(i).get(0).getpTimeHi();
+						sequence.get(id).add(
+								new PhysicalTimeInterval(" ", largestLo,
+										smallestHi));
+						bwc.write("id " + largestLo + " " + smallestHi + "\n");
+						bwc.flush();
+						for (int i = 0; i < number; i++) {
+							String end = i + 1 == number ? "\n" : " ";
+							bw.write(queue.get(i).get(0).getIntervalID() + " "
+									+ queue.get(i).get(0).getpTimeLo() + " "
+									+ queue.get(i).get(0).getpTimeHi() + end);
 						}
-						queue.get(i).remove(0);
-						currentId[i] = null;
+						bw.flush();
 					}
-					sequence.get(id)
-							.add(
-									new PhysicalTimeInterval(" ", largestLo,
-											smallestHi));
 				}
+				index = (index + 1) % number;
 			}
-			index = (index + 1) % number;
+			bwc.close();
+			bw.close();
+		} catch (Exception ex) {
+			System.out.println("output file error! " + ex);
 		}
+
+	}
+
+	/**
+	 * compute the concurrent interval from all group of normal processes
+	 */
+	public void getIntervalSequence() {
+
+		for (int i = 0; i < numOfChecker; i++) {
+			ArrayList<ArrayList<PhysicalTimeInterval>> que = new ArrayList<ArrayList<PhysicalTimeInterval>>();
+			for (int j = 0; j < numOfFile[i]; j++) {
+				que.add(queue.get(fileArrayList.get(i).get(j).intValue()));
+			}
+			getIntersection(que, numOfFile[i], i);
+		}
+
 	}
 
 	/**
 	 * 
+	 * @return the numOfChecker
 	 */
-	public void getIntervalSequence() {
-		ArrayList<ArrayList<PhysicalTimeInterval>> queue = new ArrayList<ArrayList<PhysicalTimeInterval>>();
-		for (int i = 0; i < numOfChecker; i++) {
-			queue.add(new ArrayList<PhysicalTimeInterval>());
-		}
-		for (int i = 0; i < numOfChecker; i++) {
-			read(fileArrayList.get(i), numOfFile[i], queue);
-			getIntersection(queue, numOfFile[i], i);
-		}
-
+	public int getNumOfChecker() {
+		return numOfChecker;
 	}
 
-	public void output(ArrayList<String> checkerArrayList) {
-		try {
-			for (int i = 0; i < numOfChecker; i++) {
-				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-						new FileOutputStream(checkerArrayList.get(i))));
-				int k = 1;
-				while (sequence.get(i).size() > 0) {
-					bw.write(k + " " + sequence.get(i).get(0).getpTimeLo()
-							+ " " + sequence.get(i).get(0).getpTimeHi() + "\n");
-					sequence.get(i).remove(0);
-					k++;
-					bw.flush();
-					System.out.println("aa"+i);
-				}
-				
-				bw.close();
-			}
-		} catch (Exception ex) {
-			System.out.println("output to file error " + ex);
-		}
+	/**
+	 * 
+	 * @return the checkerArray
+	 */
+	public String[] getCheckerArray() {
+		return checkerArray;
 	}
-
-	public static void main(String args[]) {
-		String checkerList = "Checker1,Checker2";
-		String fileList = "NormalProcess0,NormalProcess1,NormalProcess2,NormalProcess3";
-		ArrayList<String> checkerArrayList = new ArrayList<String>();
-		int k = 0, n = 1;
-		for (int i = 0; i < checkerList.length(); i++) {
-			if (checkerList.charAt(i) == ',') {
-				n++;
-				checkerArrayList.add(checkerList.substring(k, i));
-				k = i + 1;
-			}
-		}
-		checkerArrayList.add(checkerList.substring(k));
-		ConcurrentIntervalExtract cie = new ConcurrentIntervalExtract(n);
-
-		cie.partition(checkerArrayList, fileList);
-
-		cie.getIntervalSequence();
-
-		cie.output(checkerArrayList);
-
-	}
+	
+	/*
+	 * public static void main(String args[]) { String checkerList =
+	 * "Checker1,Checker2"; String fileList =
+	 * "NormalProcess0,NormalProcess1,NormalProcess2,NormalProcess3";
+	 * 
+	 * ConcurrentIntervalExtract cie = new
+	 * ConcurrentIntervalExtract(checkerList,fileList);
+	 * 
+	 * cie.readfile();
+	 * 
+	 * cie.getIntervalSequence();
+	 * 
+	 * 
+	 * }
+	 */
 
 }

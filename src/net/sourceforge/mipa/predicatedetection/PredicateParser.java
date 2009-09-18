@@ -79,6 +79,8 @@ public class PredicateParser implements PredicateParserMethod {
             parseOGAStructure(predicateStructure);
         else if (type == PredicateType.SCP)
             parseSCPStructure(predicateStructure);
+        else if (type == PredicateType.WCP)
+            parseWCPStructure(predicateStructure);
         else {
             System.out
                       .println("This predicate type have not been implemented yet.");
@@ -289,6 +291,75 @@ public class PredicateParser implements PredicateParserMethod {
 
     /**
      * 
+     * @param s
+     */
+    private void parseWCPStructure(Structure s) {
+        ArrayList<Structure> children = s.getChildren();
+
+        if (s.getNodeType() == NodeType.GSE) {
+            for (int i = 0; i < children.size(); i++) {
+                parseWCPStructure(children.get(i));
+            }
+        } else if (s.getNodeType() == NodeType.CGS) {
+            IDManager idManager = MIPAResource.getIDManager();
+            String owner = null;
+            try {
+                owner = idManager.getID(Catalog.Checker);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            ArrayList<String> owners = new ArrayList<String>();
+            ArrayList<String> members = new ArrayList<String>();
+            Map<String, LocalPredicate> mapping = new HashMap<String, LocalPredicate>();
+
+            owners.add(owner);
+            for (int i = 0; i < children.size(); i++) {
+                Structure unit = children.get(i);
+
+                assert (unit.getNodeType() == NodeType.LP);
+                String memberID = null;
+                try {
+                    memberID = idManager.getID(Catalog.NormalProcess);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                members.add(memberID);
+                mapping.put(memberID, (LocalPredicate) unit);
+            }
+            String groupID = null;
+            try {
+                groupID = idManager.getID(Catalog.Group);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // create group for CGS
+            Group g = new Group(groupID, owners, members, PredicateType.WCP);
+            g.setCoordinatorID(groupID);
+
+            Coordinator coordinator = MIPAResource.getCoordinator();
+            try {
+                coordinator.newCoordinator(g);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // create CGS checker.
+            String checkerName = g.getOwners().get(0);
+            String[] normalProcesses = new String[g.getMembers().size()];
+            g.getMembers().toArray(normalProcesses);
+            CheckerFactory.newChecker(callback, checkerName, normalProcesses,
+                                      g.getType());
+
+            // create Normal Processes.
+            for (int i = 0; i < members.size(); i++) {
+                LocalPredicate lp = mapping.get(members.get(i));
+                registerLocalPredicate(lp, members.get(i), g);
+            }
+        }
+    }
+    
+    /**
+     * 
      * @param fatherID
      * @param s
      */
@@ -357,7 +428,7 @@ public class PredicateParser implements PredicateParserMethod {
 
             for (int i = 0; i < members.size(); i++) {
                 LocalPredicate LP = mapping.get(members.get(i));
-                // FIND THE ECA MANAGER ID. 直接传递group
+                // FIND THE ECA MANAGER ID. 鐩存帴浼犻�group
 
             }
 

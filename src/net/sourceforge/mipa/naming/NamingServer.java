@@ -101,7 +101,11 @@ public class NamingServer {
 
         //TODO parse config will move into MIPAResource.
         NamingServer server = new NamingServer("config/config.xml");
-        System.out.println("Naming server is running...");
+        //System.out.println("Naming server is running...");
+        System.out.println("========== MIPA system Naming Server ==========");
+        System.out.println("Naming server information:");
+        System.out.println("*\tIP address: " + server.address);
+        System.out.println("*\tport: " + server.port);
         server.startServer();
     }
 }

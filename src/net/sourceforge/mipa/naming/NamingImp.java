@@ -92,7 +92,7 @@ public class NamingImp implements Naming {
      */
     public void formatAddress() {
         formatAddress = "rmi://" + registryAddress + ":" + port + "/";
-        System.out.println(formatAddress);
+        //System.out.println(formatAddress);
     }
 
     public void bind(String name, Remote obj) throws AccessException,

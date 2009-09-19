@@ -64,7 +64,7 @@ public class Application extends AbstractApplication {
     }
 
     public static void main(String[] args) {
-        Application app = new Application("config/predicate/predicate_oga.xml");
+        Application app = new Application("config/predicate/predicate_scp.xml");
         app.start("config/config.xml");
     }
 }

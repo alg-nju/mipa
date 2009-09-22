@@ -24,6 +24,7 @@ import java.io.Serializable;
 import net.sourceforge.mipa.predicatedetection.VectorClock;
 import net.sourceforge.mipa.predicatedetection.oga.OGAMessageContent;
 import net.sourceforge.mipa.predicatedetection.scp.SCPMessageContent;
+import net.sourceforge.mipa.predicatedetection.wcp.WCPMessageContent;
 
 /**
  * message class.
@@ -61,9 +62,10 @@ public class Message implements Serializable {
     /** OGA message content */
     private OGAMessageContent ogaMessageContent = null;
     
-    //TODO other predicate message content types go here.
-    
+    /** WCP message content */
+    private WCPMessageContent wcpMessageContent = null;
 
+    //TODO other predicate message content types go here.
     /**
      * @param messageID the messageID to set
      */
@@ -188,5 +190,20 @@ public class Message implements Serializable {
      */
     public OGAMessageContent getOgaMessageContent() {
         return ogaMessageContent;
+    }
+    
+    /**
+     * 
+     * @param wcpMessageContent the wcpMessageContent to set
+     */
+    public void setWcpMessageContent(WCPMessageContent wcpMessageContent) {
+        this.wcpMessageContent = wcpMessageContent;
+    }
+
+    /**
+     * @return the wcpMessageContent
+     */
+    public WCPMessageContent getWcpMessageContent() {
+        return wcpMessageContent;
     }
 }

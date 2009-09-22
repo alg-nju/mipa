@@ -39,9 +39,9 @@ import net.sourceforge.mipa.predicatedetection.wcp.WCPVectorClock;
  *
  */
 public class WCPNormalProcess extends AbstractNormalProcess {
-
-    private static final long serialVersionUID = -8644005904903568970L;
     
+    private static final long serialVersionUID = 5563952119457480166L;
+
     private boolean firstflag;
     
     private PrintWriter out;
@@ -75,13 +75,15 @@ public class WCPNormalProcess extends AbstractNormalProcess {
     public void action(boolean value) {
         // TODO Auto-generated method stub
         if(value == true && firstflag) {
+            WCPVectorClock wcpVectorClock= new WCPVectorClock(currentClock);
+            WCPMessageContent wcpMessageContent = new WCPMessageContent(wcpVectorClock);
             //??? WCP doesn't send any message to other normal processes.
             for(int i = 0; i < checkers.length; i++) {
                 String checker = checkers[i];
-                send(MessageType.Detection, checker, currentClock);
+                send(MessageType.Detection, checker, wcpMessageContent);
             }
-            //broadcast(MessageType.Control, null);
             firstflag = false;
+            broadcast(MessageType.Control, null);
 
             if(DEBUG) {
                 System.out.println(name + " firstflag: false");
@@ -102,13 +104,14 @@ public class WCPNormalProcess extends AbstractNormalProcess {
         currentClock.update(timestamp);
     }
 
-    private void send(MessageType type, String receiverName, VectorClock clock) {
+    private void send(MessageType type, String receiverName, WCPMessageContent content) {
         Message m = new Message();
         m.setType(type);
         m.setSenderID(name);
         m.setReceiverID(receiverName);
-        VectorClock current = new WCPVectorClock(clock);
+        VectorClock current = new WCPVectorClock(currentClock);
         m.setTimestamp(current);
+        m.setWcpMessageContent(content);
         
         if(currentMessageCount.containsKey(receiverName) == true) {
             long currentCount = currentMessageCount.get(receiverName);
@@ -129,14 +132,14 @@ public class WCPNormalProcess extends AbstractNormalProcess {
             if(DEBUG) {
                 System.out.println(name + " firstflag: true.");
             }
+            currentClock.increment(id);
         }
-        currentClock.increment(id);
     }
     
-    private void broadcast(MessageType type, WCPVectorClock clock) {
+    private void broadcast(MessageType type, WCPMessageContent content) {
         for(int i = 0; i < normalProcesses.length; i++) {
             if(i != id) {
-                send(type, normalProcesses[i], clock);
+                send(type, normalProcesses[i], content);
             }
         }
     }

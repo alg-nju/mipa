@@ -78,19 +78,18 @@ public class WCPVectorClock extends VectorClock {
         return !(result && first);
     }
 
-    public boolean lessThan(VectorClock timestamp) {
+    public boolean lessOrEqual(VectorClock timestamp) {
         ArrayList<Long> right = timestamp.getVectorClock();
         ArrayList<Long> left = vectorClock;
         
         assert(right.size() == left.size());
-        boolean result = true, first = false;
+        boolean result = true;
         for(int i = 0; i < right.size(); i++) {
             long rightValue = right.get(i).longValue();
             long leftValue = left.get(i).longValue();
             if(leftValue > rightValue) result = false;
-            else if(leftValue < rightValue) first = true;
         }
-        return (result && first);
+        return result;
     }
     
     @Override

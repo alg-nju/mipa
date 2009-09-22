@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import net.sourceforge.mipa.ResultCallback;
 import net.sourceforge.mipa.components.Message;
 import net.sourceforge.mipa.predicatedetection.AbstractChecker;
-import net.sourceforge.mipa.predicatedetection.wcp.WCPVectorClock;
 
 /**
  * 
@@ -35,9 +34,9 @@ import net.sourceforge.mipa.predicatedetection.wcp.WCPVectorClock;
  */
 public class WCPChecker extends AbstractChecker {
 
-    private static final long serialVersionUID = -3496165778453679180L;
-    
-    private ArrayList<ArrayList<WCPVectorClock>> queues;
+    private static final long serialVersionUID = 419844422773355168L;
+
+    private ArrayList<ArrayList<WCPMessageContent>> queues;
     
     private long[] currentMessageCount;
     
@@ -51,10 +50,10 @@ public class WCPChecker extends AbstractChecker {
         // TODO Auto-generated constructor stub
         currentMessageCount = new long[normalProcesses.length];
         
-        queues = new ArrayList<ArrayList<WCPVectorClock>>();
+        queues = new ArrayList<ArrayList<WCPMessageContent>>();
         msgBuffer = new ArrayList<ArrayList<Message>>();
         for (int i = 0; i < normalProcesses.length; i++) {
-            queues.add(new ArrayList<WCPVectorClock>());
+            queues.add(new ArrayList<WCPMessageContent>());
             msgBuffer.add(new ArrayList<Message>());
             currentMessageCount[i] = 0;
         }
@@ -132,11 +131,11 @@ public class WCPChecker extends AbstractChecker {
         String normalProcess = messages.get(0).getSenderID();
         int id = nameToID.get(normalProcess).intValue();
         
-        ArrayList<WCPVectorClock> contents = new ArrayList<WCPVectorClock> ();
+        ArrayList<WCPMessageContent> contents = new ArrayList<WCPMessageContent> ();
         for(int i = 0; i < messages.size(); i++)
-            contents.add((WCPVectorClock) messages.get(i).getTimestamp());
+            contents.add(messages.get(i).getWcpMessageContent());
 
-        ArrayList<WCPVectorClock> queue = queues.get(id);
+        ArrayList<WCPMessageContent> queue = queues.get(id);
         
         if (queue.size() == 0) {
             for(int i = 0; i < contents.size(); i++) queue.add(contents.get(i));
@@ -151,15 +150,23 @@ public class WCPChecker extends AbstractChecker {
                         for (int j = 0; j < children.length; j++) {
                             if (elem == j)
                                 continue;
-                            ArrayList<WCPVectorClock> qi = queues.get(elem);
-                            ArrayList<WCPVectorClock> qj = queues.get(j);
+                            ArrayList<WCPMessageContent> qi = queues.get(elem);
+                            ArrayList<WCPMessageContent> qj = queues.get(j);
                             if (qi.size() != 0 && qj.size() != 0) {
-                                WCPVectorClock qiHead = qi.get(0);
-                                WCPVectorClock qjHead = qj.get(0);
-                                if (qiHead.lessThan(qjHead)) {
+                                WCPMessageContent qiHead = qi.get(0);
+                                WCPMessageContent qjHead = qj.get(0);
+                                if (qiHead
+                                          .getWcpVectorClock()
+                                          .lessOrEqual(
+                                                       qjHead
+                                                       .getWcpVectorClock())) {
                                     addOnce(newchanged, new Integer(elem));
                                 }
-                                if (qjHead.lessThan(qiHead)) {
+                                if (qjHead
+                                          .getWcpVectorClock()
+                                          .lessOrEqual(
+                                                       qiHead
+                                                       .getWcpVectorClock())) {
                                     addOnce(newchanged, new Integer(j));
                                 }
                             }

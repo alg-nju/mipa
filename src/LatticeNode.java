@@ -3,22 +3,15 @@ import java.util.*;
 
 public class LatticeNode {
 	
-	private int NodeId;
+	private State[] cgs;
 	
-	private ArrayList<ArrayList<Event>> ideal;
-	
-	private ArrayList<State> cgs;
-	
-	private LatticeNode previous;
-	
-	private LatticeNode next;
-	
-	private LatticeNode brother;  //???
+	private ArrayList<LatticeNode> next;
 	
 
-	
-	
-	
+	public LatticeNode(State[] gs){
+		State[] cgs=new State[gs.length];
+		next=new ArrayList<LatticeNode>();
+	}
 	
 
 }

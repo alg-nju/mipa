@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE naming SYSTEM "config.dtd">
-<naming>
-	<address>127.0.0.1</address>
-	<port>1099</port>
-</naming>

@@ -1,3 +1,0 @@
-<!ELEMENT naming (address, port)>
-<!ELEMENT address (#PCDATA)>
-<!ELEMENT port (#PCDATA)>

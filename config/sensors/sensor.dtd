@@ -1,7 +1,0 @@
-<!ELEMENT sensor (name, id, class, location, SensorType, ValueType)>
-<!ELEMENT name (#PCDATA)>
-<!ELEMENT id (#PCDATA)>
-<!ELEMENT class (#PCDATA)>
-<!ELEMENT location (#PCDATA)>
-<!ELEMENT SensorType (#PCDATA)>
-<!ELEMENT ValueType (#PCDATA)>

@@ -3,14 +3,17 @@ import java.util.*;
 
 public class LatticeNode {
 	
-	private State[] cgs;
+	protected State[] cgs;
 	
-	private ArrayList<LatticeNode> next;
+	protected ArrayList<LatticeNode> next;
+	
+	protected ArrayList<LatticeNode> previous;
 	
 
 	public LatticeNode(State[] gs){
-		State[] cgs=new State[gs.length];
+		cgs=new State[gs.length];
 		next=new ArrayList<LatticeNode>();
+		previous=new ArrayList<LatticeNode>();
 	}
 	
 

@@ -27,8 +27,11 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sourceforge.mipa.components.MIPAResource;
 import net.sourceforge.mipa.components.Message;
 import net.sourceforge.mipa.components.MessageType;
+import net.sourceforge.mipa.naming.Catalog;
+import net.sourceforge.mipa.naming.IDManager;
 import net.sourceforge.mipa.predicatedetection.AbstractNormalProcess;
 import net.sourceforge.mipa.predicatedetection.VectorClock;
 import net.sourceforge.mipa.predicatedetection.wcp.WCPVectorClock;
@@ -77,6 +80,19 @@ public class WCPNormalProcess extends AbstractNormalProcess {
         if(value == true && firstflag) {
             WCPVectorClock wcpVectorClock= new WCPVectorClock(currentClock);
             WCPMessageContent wcpMessageContent = new WCPMessageContent(wcpVectorClock);
+           
+            if(ENABLE_PHYSICAL_CLOCK) {
+                IDManager idManager = MIPAResource.getIDManager();
+                try {
+                    String contentID = idManager.getID(Catalog.Numerical);
+                    wcpMessageContent.setContentID(contentID);
+                    out.println(contentID + ":[" +wcpVectorClock.toString() + "]");
+                    out.flush();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            
             //??? WCP doesn't send any message to other normal processes.
             for(int i = 0; i < checkers.length; i++) {
                 String checker = checkers[i];

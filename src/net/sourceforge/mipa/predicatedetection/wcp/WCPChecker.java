@@ -19,6 +19,9 @@
  */
 package net.sourceforge.mipa.predicatedetection.wcp;
 
+import static config.Config.ENABLE_PHYSICAL_CLOCK;
+import static config.Config.LOG_DIRECTORY;
+
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -56,6 +59,14 @@ public class WCPChecker extends AbstractChecker {
             queues.add(new ArrayList<WCPMessageContent>());
             msgBuffer.add(new ArrayList<Message>());
             currentMessageCount[i] = 0;
+        }
+        
+        if(ENABLE_PHYSICAL_CLOCK) {
+            try {
+                out = new PrintWriter(LOG_DIRECTORY + "/found_interval.txt");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
     
@@ -193,11 +204,20 @@ public class WCPChecker extends AbstractChecker {
                     }
                 } else
                     break;
-
                 // detection found
                 for (int i = 0; i < children.length; i++) {
-                    queues.get(i).remove(0);
-
+                    WCPMessageContent foundContent = queues.get(i).remove(0);
+                    if(ENABLE_PHYSICAL_CLOCK) {
+                        String contentID = foundContent.getContentID();
+                        WCPVectorClock wcpVectorClock = foundContent.getWcpVectorClock();
+                        try {
+                            String end = i + 1 != children.length ? " " : "\n";
+                            out.print(contentID + ":[" +wcpVectorClock.toString() +"]"+ end);
+                            out.flush();
+                        } catch(Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                     changed.add(new Integer(i));
                 }
             }

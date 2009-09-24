@@ -31,6 +31,8 @@ public class WCPMessageContent implements Serializable {
     private static final long serialVersionUID = 8645743008656858830L;
     
     private WCPVectorClock wcpVectorClock;
+    
+    private String contentID;
 
     public WCPMessageContent(WCPVectorClock wcpVectorClock) {
         this.wcpVectorClock = wcpVectorClock;
@@ -42,5 +44,13 @@ public class WCPMessageContent implements Serializable {
 
     public WCPVectorClock getWcpVectorClock() {
         return wcpVectorClock;
+    }
+
+    public void setContentID(String contentID) {
+        this.contentID = contentID;
+    }
+
+    public String getContentID() {
+        return contentID;
     }
 }

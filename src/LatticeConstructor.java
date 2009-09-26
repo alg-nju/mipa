@@ -1,5 +1,6 @@
 
 import java.util.*;
+import java.io.*;
 
 public class LatticeConstructor {
 	
@@ -24,15 +25,17 @@ public class LatticeConstructor {
 		stateSet=new ArrayList<ArrayList<State>>();
 		max=new ArrayList<State>();
 		nameToID=new HashMap<String, Integer>();
-		
+		String s="";
 		for(int i=0;i<dimension;i++){
 			ArrayList<State> list=new ArrayList<State>();
 			list.add(globalState[i]);
+			max.add(globalState[i]);
 			stateSet.add(list);
 			nameToID.put(process[i], new Integer(i));
+			s=s+0;
 		}
 		
-		startNode=new LatticeNode(globalState);
+		startNode=new LatticeNode(globalState,s);
 		currentNode=startNode;
 		
 	}
@@ -88,7 +91,12 @@ public class LatticeConstructor {
 							State news=iter.next();
 							
 							globalState[processID]=news;
-							LatticeNode newnode=new LatticeNode(globalState);
+							String str="";
+							for(int j=0;j<dimension;j++){
+								int temp=stateSet.get(j).size()-stateSet.get(j).indexOf(globalState[j])-1;
+								str=str+temp;
+							}
+							LatticeNode newnode=new LatticeNode(globalState,str);
 							currentNode.previous.add(newnode);
 							newnode.next.add(currentNode);
 							for(int j=0;j<currentNode.previous.size()-1;j++){
@@ -122,10 +130,6 @@ public class LatticeConstructor {
 								point.push(0);
 							}
 							
-						}else{
-							//???
-							System.out.println("error! no previous state.");
-							return;
 						}
 						break;
 					}
@@ -145,6 +149,9 @@ public class LatticeConstructor {
 		ArrayList<State> pred=new ArrayList<State>();
 		for(int i=0;i<dimension;i++){
 			if(i!=processID){
+				if(stateSet.get(i).size()<2){
+					break;
+				}
 				State state=stateSet.get(i).get(1);
 				if(state.vc.lessThan(s.vc)){
 					pred.add(stateSet.get(i).get(0));
@@ -166,8 +173,13 @@ public class LatticeConstructor {
 		int processID=nameToID.get(s.processName).intValue();
 		globalState[processID]=s;
 		stateSet.get(processID).add(0, s);
+		String str="";
+		for(int j=0;j<dimension;j++){
+			int temp=stateSet.get(j).size()-stateSet.get(j).indexOf(globalState[j])-1;
+			str=str+temp;
+		}
 		
-		LatticeNode node=new LatticeNode(globalState);
+		LatticeNode node=new LatticeNode(globalState,str);
 		currentNode.next.add(node);
 		node.previous.add(currentNode);
 		currentNode=node;
@@ -184,8 +196,56 @@ public class LatticeConstructor {
 	}
 		
 	
-	public void construct(){
+	public void construct(String filename){
+		try{
+			BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
+			while(br.ready()){
+				String s=br.readLine();
+				String[] string=s.split(" ");
+				String pname=string[0];
+				LatticeVectorClock vc=new LatticeVectorClock(dimension);
+				ArrayList<Long> clock=new ArrayList<Long>();
+				for(int i=1;i<string.length;i++){
+					clock.add(new Long(string[i]));
+				}
+				vc.setVectorClock(clock);
+				State state=new State(vc,pname);
+				grow(state);
+			}
+			
+		}catch(Exception ex){
+			System.out.println(ex);
+		}
 		
+		traversal(startNode);
+	}
+	
+	
+	public void traversal(LatticeNode node){
+		System.out.print(node.ID+" ");
+		Iterator<LatticeNode> it=node.next.iterator();
+		while(it.hasNext()){
+			LatticeNode nextnode=it.next();
+			traversal(nextnode);
+		}
+		
+	}
+	
+	
+	public static void main(String[] args){
+		String s="process1,process2";
+		String[] string=s.split(",");
+		State[] state=new State[string.length];
+		for(int i=0;i<string.length;i++){
+			LatticeVectorClock vc=new LatticeVectorClock(string.length);
+			vc.increment(i);
+			state[i]=new State(vc,string[i]);
+		}
+		
+		LatticeConstructor lc=new LatticeConstructor(string,state);
+		
+		String filename="input";
+		lc.construct(filename);
 	}
 	
 

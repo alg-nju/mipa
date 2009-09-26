@@ -8,7 +8,7 @@ public class State {
 	//protected boolean localPredicate;
 	
 	public State(LatticeVectorClock lvc,String pname){
-		vc.setVectorClock(lvc.getVectorClock());
+		vc=new LatticeVectorClock(lvc);
 		processName=pname;
 	}
 	

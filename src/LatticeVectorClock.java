@@ -77,13 +77,18 @@ public class LatticeVectorClock extends VectorClock{
         ArrayList<Long> left = vectorClock;
         
         assert(right.size() == left.size());
-        boolean result = true;
+        boolean result = true,first=true;
         for(int i = 0; i < right.size(); i++) {
             long rightValue = right.get(i).longValue();
             long leftValue = left.get(i).longValue();
-            if((leftValue > rightValue)||(leftValue == rightValue)) result = false;
+            if(leftValue > rightValue) result = false;
+            else if(leftValue < rightValue) first = false;
         }
-        return result;
+       if(result&&first){
+    	   return false;
+       }else{
+    	   return result;
+       }
 	}
 	
 }

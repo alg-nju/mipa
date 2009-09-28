@@ -18,6 +18,8 @@ public class LatticeConstructor {
 	
 	private LatticeNode currentNode;
 	
+	private int lastProcessID;
+	
 	
 	public LatticeConstructor(String[] process,State[] state){
 		dimension=process.length;
@@ -37,6 +39,7 @@ public class LatticeConstructor {
 		
 		startNode=new LatticeNode(globalState,s);
 		currentNode=startNode;
+		lastProcessID=-1;
 		
 	}
 
@@ -56,7 +59,8 @@ public class LatticeConstructor {
 		if(b&&(position>-1)){
 			b=false;
 			for(int j=0;j<stateSet.get(position).size()-1;j++){
-				if((node1.cgs[position]==stateSet.get(position).get(j))&&(node2.cgs[position]==stateSet.get(position).get(j+1))){
+				
+				if((node2.cgs[position]==stateSet.get(position).get(j))&&(node1.cgs[position]==stateSet.get(position).get(j+1))){
 					b=true;
 				}
 			}
@@ -71,6 +75,9 @@ public class LatticeConstructor {
 		Stack<LatticeNode> stack=new Stack<LatticeNode>();
 		Stack<Integer> point=new Stack<Integer>();
 		point.push(new Integer(list.size()));
+		code.push(list.get(0));
+		stack.push(currentNode);
+		boolean bool=true;
 		
 		while(!point.empty()){
 			int value=point.pop().intValue();
@@ -80,7 +87,6 @@ public class LatticeConstructor {
 				code.push(st);
 				stack.push(currentNode);
 				
-				//get new_s
 				int processID=nameToID.get(st.processName).intValue();
 				ArrayList<State> stateList= stateSet.get(processID);
 				Iterator<State> iter=stateList.iterator();
@@ -89,7 +95,6 @@ public class LatticeConstructor {
 					if(s==st){
 						if(iter.hasNext()){
 							State news=iter.next();
-							
 							globalState[processID]=news;
 							String str="";
 							for(int j=0;j<dimension;j++){
@@ -111,7 +116,45 @@ public class LatticeConstructor {
 							}
 							currentNode=newnode;
 							
-							boolean flag=true;
+							ArrayList<State> new_s=new ArrayList<State>();
+							for(int k=0;k<dimension;k++){
+								if((k!=lastProcessID)){
+									int index=stateSet.get(k).indexOf(globalState[k]);
+									boolean flag=true;
+									if(index+1<stateSet.get(k).size()){
+										State comps=stateSet.get(k).get(index+1);
+										for(int j=0;j<dimension;j++){
+											if((j!=k)&&(comps.vc.lessThan(globalState[j].vc))){
+												flag=false;
+											}
+										}
+									}else{
+										flag=false;
+									}
+									if(flag){
+										new_s.add(globalState[k]);
+									}
+								}
+							}
+							int number=0;
+							if(new_s.size()>0){
+								
+								for(int k=0;k<new_s.size();k++){
+									if(list.contains(new_s.get(k))==false){
+										list.add(i+1,new_s.get(k));
+										number++;
+									}
+								}
+								point.push(value-1);
+								point.push(value+number-1);
+							}else{
+								if((point.size()>0)&&bool){
+									point.push(0);
+									bool=false;
+								}
+								point.push(0);
+							}
+							/*boolean flag=true;
 							if(iter.hasNext()){
 								State comps=iter.next();
 								for(int j=0;j<dimension;j++){
@@ -128,8 +171,9 @@ public class LatticeConstructor {
 								point.push(value);
 							}else{
 								point.push(0);
-							}
-							
+							}*/
+						}else{
+							point.push(0);
 						}
 						break;
 					}
@@ -192,6 +236,7 @@ public class LatticeConstructor {
 		}
 		max.add(0, s);
 		
+		lastProcessID=processID;
 		generate(sList);
 	}
 		
@@ -233,7 +278,7 @@ public class LatticeConstructor {
 	
 	
 	public static void main(String[] args){
-		String s="process1,process2";
+		String s="process1,process2,process3";
 		String[] string=s.split(",");
 		State[] state=new State[string.length];
 		for(int i=0;i<string.length;i++){

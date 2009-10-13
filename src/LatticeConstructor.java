@@ -59,7 +59,6 @@ public class LatticeConstructor {
 		if(b&&(position>-1)){
 			b=false;
 			for(int j=0;j<stateSet.get(position).size()-1;j++){
-				
 				if((node2.cgs[position]==stateSet.get(position).get(j))&&(node1.cgs[position]==stateSet.get(position).get(j+1))){
 					b=true;
 				}
@@ -73,17 +72,25 @@ public class LatticeConstructor {
 	public void generate(ArrayList<State> list){
 		Stack<State> code= new Stack<State>();
 		Stack<LatticeNode> stack=new Stack<LatticeNode>();
-		Stack<Integer> point=new Stack<Integer>();
-		point.push(new Integer(list.size()));
+		
+		//Stack<Integer> point=new Stack<Integer>();
+		
+		Stack<ArrayList<State>> listStack=new Stack<ArrayList<State>>();
+		listStack.push(list);
+		
+		//point.push(new Integer(list.size()));
 		code.push(list.get(0));
 		stack.push(currentNode);
-		boolean bool=true;
+		//boolean bool=true;
 		
-		while(!point.empty()){
-			int value=point.pop().intValue();
-			int i=list.size()-value;
-			if(i<list.size()){
-				State st=list.get(i);
+		while(!listStack.empty()){
+			ArrayList<State> slist=listStack.pop();
+			//int value=point.pop().intValue();
+			//int i=list.size()-value;
+			if(slist.size()>0){
+				State st=slist.get(0);
+				slist.remove(0);
+				listStack.push(slist);
 				code.push(st);
 				stack.push(currentNode);
 				
@@ -94,6 +101,7 @@ public class LatticeConstructor {
 					State s=iter.next();
 					if(s==st){
 						if(iter.hasNext()){
+							//create new LatticeNode by back state st, and build the link relation ship with existed node
 							State news=iter.next();
 							globalState[processID]=news;
 							String str="";
@@ -115,7 +123,7 @@ public class LatticeConstructor {
 								}
 							}
 							currentNode=newnode;
-							
+							//compute the new LatticeNode's list
 							ArrayList<State> new_s=new ArrayList<State>();
 							for(int k=0;k<dimension;k++){
 								if((k!=lastProcessID)){
@@ -136,44 +144,11 @@ public class LatticeConstructor {
 									}
 								}
 							}
-							int number=0;
-							if(new_s.size()>0){
-								
-								for(int k=0;k<new_s.size();k++){
-									if(list.contains(new_s.get(k))==false){
-										list.add(i+1,new_s.get(k));
-										number++;
-									}
-								}
-								point.push(value-1);
-								point.push(value+number-1);
-							}else{
-								if((point.size()>0)&&bool){
-									point.push(0);
-									bool=false;
-								}
-								point.push(0);
-							}
-							/*boolean flag=true;
-							if(iter.hasNext()){
-								State comps=iter.next();
-								for(int j=0;j<dimension;j++){
-									if((j!=processID)&&(comps.vc.lessThan(globalState[j].vc))){
-										flag=false;
-									}
-								}
-							}else{
-								flag=false;
-							}
-							if(flag){
-								list.add(i+1, news);
-								point.push(value-1);
-								point.push(value);
-							}else{
-								point.push(0);
-							}*/
+							
+							listStack.push(new_s);
+							
 						}else{
-							point.push(0);
+							listStack.push(new ArrayList<State>());
 						}
 						break;
 					}
@@ -194,7 +169,7 @@ public class LatticeConstructor {
 		for(int i=0;i<dimension;i++){
 			if(i!=processID){
 				if(stateSet.get(i).size()<2){
-					break;
+					continue;
 				}
 				State state=stateSet.get(i).get(1);
 				if(state.vc.lessThan(s.vc)){
@@ -237,11 +212,20 @@ public class LatticeConstructor {
 		max.add(0, s);
 		
 		lastProcessID=processID;
-		generate(sList);
+		if(sList.size()>0){
+			generate(sList);
+		}
 	}
 		
 	
 	public void construct(String filename){
+		
+		ArrayList<ArrayList<State>> buffer=new ArrayList<ArrayList<State>>();
+		for(int i=0;i<dimension;i++){
+			buffer.add(new ArrayList<State>());
+			buffer.get(i).add(globalState[i]);
+		}
+		
 		try{
 			BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
 			while(br.ready()){
@@ -255,7 +239,45 @@ public class LatticeConstructor {
 				}
 				vc.setVectorClock(clock);
 				State state=new State(vc,pname);
-				grow(state);
+				
+				int pID=nameToID.get(pname).intValue();
+				if(buffer.get(pID).size()==1){
+					boolean b=true;
+					for(int i=0;i<dimension;i++){
+						if((i!=pID)&&(buffer.get(i).get(0).vc.lessThan(state.vc))){
+							b=false;
+						}
+					}
+					if(b){
+						buffer.get(pID).remove(0);
+						buffer.get(pID).add(state);
+						grow(state);
+						for(int i=0;i<dimension;i++){
+							if((i!=pID)){
+								while((buffer.get(i).size()>1)){
+									boolean bo=true;
+									for(int j=0;j<dimension;j++){
+										if((j!=i)&&(buffer.get(j).get(0).vc.lessThan(buffer.get(i).get(1).vc))){
+											bo=false;
+										}
+									}
+									if(bo){
+										buffer.get(i).remove(0);
+										grow(buffer.get(i).get(0));
+									}else{
+										break;
+									}
+								}
+							}
+						}
+					}else{
+						buffer.get(pID).add(state);
+					}
+				}else{
+					buffer.get(pID).add(state);
+				}
+				
+				//grow(state);
 			}
 			
 		}catch(Exception ex){

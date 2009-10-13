@@ -110,6 +110,21 @@ public class LatticeConstructor {
 								str=str+temp;
 							}
 							LatticeNode newnode=new LatticeNode(globalState,str);
+							//check whether the node has been created.
+							ArrayList<LatticeNode> nodelist=currentNode.previous;
+							Iterator<LatticeNode> nodeiter=nodelist.iterator();
+							boolean bool=false;
+							while(nodeiter.hasNext()){
+								LatticeNode lnode=nodeiter.next();
+								if(lnode.ID.compareTo(newnode.ID)==0){
+									bool=true;
+								}
+							}
+							if(bool){
+								listStack.push(new ArrayList<State>());
+								break;
+							}
+							//if not created, add into the lattice.
 							currentNode.previous.add(newnode);
 							newnode.next.add(currentNode);
 							for(int j=0;j<currentNode.previous.size()-1;j++){

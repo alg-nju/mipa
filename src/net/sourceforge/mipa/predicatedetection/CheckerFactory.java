@@ -30,6 +30,7 @@ import net.sourceforge.mipa.naming.Naming;
 import net.sourceforge.mipa.predicatedetection.oga.OGASubChecker;
 import net.sourceforge.mipa.predicatedetection.oga.OGATopChecker;
 import net.sourceforge.mipa.predicatedetection.scp.SCPChecker;
+import net.sourceforge.mipa.predicatedetection.wcp.WCPChecker;
 
 /**
  * 
@@ -125,7 +126,17 @@ public class CheckerFactory {
             case LP:
 
             case WCP:
-
+                WCPChecker wcpChecker = new WCPChecker(application, checkerName,
+                                                    normalProcesses);
+                Communication wcpCheckerStub 
+                                    = (Communication) UnicastRemoteObject
+                                                            .exportObject(wcpChecker,
+                                                                           0);
+                server.bind(checkerName, wcpCheckerStub);
+                if (DEBUG) {
+                    System.out.println("binding checker " + checkerName);
+                }
+                break;
             default:
                 System.out.println("Type has not been defined.");
             }

@@ -226,13 +226,79 @@ public class GroupManager {
                           maxLevel);
             break;
         case WCP:
-            
+            allocateAsWCP(groups, 
+                          groupToChecker, 
+                          localPredicateToNormalProcess, 
+                          callback, 
+                          maxLevel);
             break;
         default:
             System.out.println("This predicate type have not been implemented yet.");
         }
     }
     
+    private void allocateAsWCP(Map<String, AbstractGroup> groups,
+                                  Map<String, String> groupToChecker,
+                                  Map<LocalPredicate, String> localPredicateToNormalProcess,
+                                  String callback,
+                                  int maxLevel) {
+        IDManager idManager = MIPAResource.getIDManager();
+        Coordinator coordinator = MIPAResource.getCoordinator();
+        
+        // start checker for level > 0
+        for(int i = maxLevel; i > 0; i--) {
+            
+        }
+        
+        // check the level == 0
+        for(String s : groups.keySet()) {
+            AbstractGroup g = groups.get(s);
+            if(g.getLevel() == 0) {
+                String gid = g.getGroupId();
+                
+                // current Implementation is that father of WCP checker is null;
+                
+                ArrayList<Object> children = g.getChildren();
+                ArrayList<String> owners = new ArrayList<String>();
+                ArrayList<String> members = new ArrayList<String>();
+                owners.add(groupToChecker.get(gid));
+                for(int i = 0; i < children.size(); i++) {
+                    members.add(localPredicateToNormalProcess.get(children.get(i)));
+                }
+                // create group
+                String groupId = null;
+                try {
+                    groupId = idManager.getID(Catalog.Group);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+                
+                Group ng = new Group(groupId, owners, members, PredicateType.WCP);
+                ng.setCoordinatorID(groupId);
+                
+                try {
+                    coordinator.newCoordinator(ng);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                
+                String checkerName = ng.getOwners().get(0);
+                String[] normalProcesses = new String[ng.getMembers().size()];
+                ng.getMembers().toArray(normalProcesses);
+                CheckerFactory.newChecker(callback, checkerName, normalProcesses,
+                                          ng.getType());
+
+                // create Normal Processes.
+                for (int i = 0; i < children.size(); i++) {
+                    broker.registerLocalPredicate((LocalPredicate) children.get(i), 
+                                                  localPredicateToNormalProcess.get(children.get(i)), 
+                                                  ng);
+                }
+            }
+        }
+    }
+
+
     private void allocateAsOGA(Map<String, AbstractGroup> groups, 
                                   Map<String, String> groupToChecker, 
                                   Map<LocalPredicate, String> localPredicateToNormalProcess, 
@@ -624,6 +690,76 @@ public class GroupManager {
         }
     }
 
+    /**
+     * 
+     * @param s
+     * @param callback
+     */
+    public void parseWCPStructure(Structure s, String callback) {
+        ArrayList<Structure> children = s.getChildren();
+
+        if (s.getNodeType() == NodeType.GSE) {
+            for (int i = 0; i < children.size(); i++) {
+                parseWCPStructure(children.get(i), callback);
+            }
+        } else if (s.getNodeType() == NodeType.CGS) {
+            IDManager idManager = MIPAResource.getIDManager();
+            String owner = null;
+            try {
+                owner = idManager.getID(Catalog.Checker);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            ArrayList<String> owners = new ArrayList<String>();
+            ArrayList<String> members = new ArrayList<String>();
+            Map<String, LocalPredicate> mapping = new HashMap<String, LocalPredicate>();
+
+            owners.add(owner);
+            for (int i = 0; i < children.size(); i++) {
+                Structure unit = children.get(i);
+
+                assert (unit.getNodeType() == NodeType.LP);
+                String memberID = null;
+                try {
+                    memberID = idManager.getID(Catalog.NormalProcess);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                members.add(memberID);
+                mapping.put(memberID, (LocalPredicate) unit);
+            }
+            String groupID = null;
+            try {
+                groupID = idManager.getID(Catalog.Group);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // create group for CGS
+            Group g = new Group(groupID, owners, members, PredicateType.WCP);
+            g.setCoordinatorID(groupID);
+
+            Coordinator coordinator = MIPAResource.getCoordinator();
+            try {
+                coordinator.newCoordinator(g);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // create CGS checker.
+            String checkerName = g.getOwners().get(0);
+            String[] normalProcesses = new String[g.getMembers().size()];
+            g.getMembers().toArray(normalProcesses);
+            CheckerFactory.newChecker(callback, checkerName, normalProcesses,
+                                      g.getType());
+
+            // create Normal Processes.
+            for (int i = 0; i < members.size(); i++) {
+                LocalPredicate lp = mapping.get(members.get(i));
+                broker.registerLocalPredicate(lp, members.get(i), g);
+            }
+        }
+    }
+    
     /**
      * 
      * @param fatherID

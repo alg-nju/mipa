@@ -35,6 +35,7 @@ import net.sourceforge.mipa.predicatedetection.NormalProcess;
 import net.sourceforge.mipa.predicatedetection.PredicateType;
 import net.sourceforge.mipa.predicatedetection.oga.OGANormalProcess;
 import net.sourceforge.mipa.predicatedetection.scp.SCPNormalProcess;
+import net.sourceforge.mipa.predicatedetection.wcp.WCPNormalProcess;
 
 /**
  * 
@@ -123,7 +124,11 @@ public class ECAManagerImp implements ECAManager {
                                                             .exportObject(np, 0);
                 action = np;
             } else if (g.getType() == PredicateType.WCP) {
-
+                WCPNormalProcess np = new WCPNormalProcess(name, checkers,
+                                                           normalProcesses);
+                npStub = (NormalProcess) UnicastRemoteObject
+                                                            .exportObject(np, 0);
+                action = np;
             } else if (g.getType() == PredicateType.LP) {
 
             } else {

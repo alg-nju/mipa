@@ -19,5 +19,13 @@ public class LocalState {
 		vc.setVectorClock(lvc.getVectorClock());
 
 	}
+	
+	public boolean getlocalPredicate(){
+		return localPredicate;
+	}
+	
+	public LatticeVectorClock getvc(){
+		return vc;
+	}
 
 }

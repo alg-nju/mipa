@@ -92,4 +92,12 @@ public class LatticeVectorClock extends VectorClock {
 		}
 	}
 
+	public String toString() {
+        String string = "";
+        for (int i = 0; i < vectorClock.size(); i++) {
+            String clock = String.valueOf(vectorClock.get(i).longValue());
+            string=string + clock + " ";
+        }
+        return string.trim();
+    }
 }

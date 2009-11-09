@@ -1,10 +1,7 @@
 package net.sourceforge.mipa.predicatedetection.lattice;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Stack;
-
+import java.util.*;
 import net.sourceforge.mipa.ResultCallback;
 import net.sourceforge.mipa.components.Message;
 import net.sourceforge.mipa.predicatedetection.AbstractChecker;
@@ -47,17 +44,17 @@ public abstract class LatticeChecker extends AbstractChecker {
 		buffer = new ArrayList<ArrayList<LocalState>>();
 		max = new ArrayList<LocalState>();
 
-		// String[] s = new String[dimension];
+		String[] s = new String[dimension];
 		for (int i = 0; i < dimension; i++) {
 			stateSet.add(new ArrayList<LocalState>());
 			stateSet.get(i).add(globalState[i]);
 			buffer.add(new ArrayList<LocalState>());
 			buffer.get(i).add(globalState[i]);
 			max.add(globalState[i]);
-			// s[i] = "0";
+			s[i] = "0";
 		}
 
-		startNode = createNode(globalState);
+		startNode = createNode(globalState,s);
 		currentNode = startNode;
 
 	}
@@ -81,7 +78,6 @@ public abstract class LatticeChecker extends AbstractChecker {
 					messages.add(buffer.remove(0));
 				}
 
-				boolean update = false;
 				for (int i = 0; i < messages.size(); i++) {
 					Message mess = messages.get(i);
 					LatticeMessageContent content = mess
@@ -90,15 +86,12 @@ public abstract class LatticeChecker extends AbstractChecker {
 							content.getlvc(), content.getlocalPredicate());
 					boolean b = buffer(localstate);
 					if (b) {
-						update = true;
+						check(startNode,currentNode);
 					}
 				}
-				if (update) {
-					check();
-				}
+				
 			}
 		}
-
 	}
 
 	private void add(ArrayList<Message> messages, Message msg) {
@@ -237,7 +230,13 @@ public abstract class LatticeChecker extends AbstractChecker {
 		stateSet.get(pID).add(0, state);
 		globalState[pID] = state;
 		// add new node into Lattice with state as the edge
-		AbstractLatticeNode node = createNode(globalState);
+		String[] str = new String[dimension];
+		for (int j = 0; j < dimension; j++) {
+			int temp = stateSet.get(j).size()
+					- stateSet.get(j).indexOf(globalState[j]) - 1;
+			str[j]=String.valueOf(temp);
+		}
+		AbstractLatticeNode node = createNode(globalState,str);
 		currentNode.next.add(node);
 		node.previous.add(currentNode);
 		currentNode = node;
@@ -277,14 +276,13 @@ public abstract class LatticeChecker extends AbstractChecker {
 								// node
 								LocalState news = it.next();
 								globalState[st.processID] = news;
-								String str = "";
 								for (int j = 0; j < dimension; j++) {
 									int temp = stateSet.get(j).size()
 											- stateSet.get(j).indexOf(
 													globalState[j]) - 1;
-									str = str + temp;
+									str[j]=String.valueOf(temp);
 								}
-								AbstractLatticeNode newnode = createNode(globalState);
+								AbstractLatticeNode newnode = createNode(globalState,str);
 								// check whether the node has been created.
 								ArrayList<AbstractLatticeNode> nodelist = currentNode.previous;
 								Iterator<AbstractLatticeNode> nodeiter = nodelist
@@ -359,8 +357,8 @@ public abstract class LatticeChecker extends AbstractChecker {
 
 	}
 
-	public abstract AbstractLatticeNode createNode(LocalState[] globalState);
+	public abstract AbstractLatticeNode createNode(LocalState[] globalState,String[] s);
 
-	public abstract void check();
+	public abstract void check(AbstractLatticeNode startNode, AbstractLatticeNode currentNode);
 
 }

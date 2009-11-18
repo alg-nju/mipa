@@ -3,12 +3,15 @@ package net.sourceforge.mipa.predicatedetection.lattice.wcp;
 import static config.Config.LOG_DIRECTORY;
 
 import java.io.PrintWriter;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.sourceforge.mipa.ResultCallback;
+import net.sourceforge.mipa.components.Message;
 import net.sourceforge.mipa.predicatedetection.lattice.AbstractLatticeNode;
 import net.sourceforge.mipa.predicatedetection.lattice.LatticeChecker;
+import net.sourceforge.mipa.predicatedetection.lattice.LatticeMessageContent;
 import net.sourceforge.mipa.predicatedetection.lattice.LocalState;
 
 public class WCPLatticeChecker extends LatticeChecker {
@@ -57,7 +60,8 @@ public class WCPLatticeChecker extends LatticeChecker {
 					LocalState[] gs=child.getglobalState();
 					for(int i=0;i<gs.length;i++){
 						try {
-	                        String end = i + 1 != children.length ? " " : "\n";
+							application.callback(String.valueOf(true));
+	                        String end = i + 1 != children.length ? " " : "\r\n";
 	                        out.print("[" +gs[i].getvc().toString() +"]"+ end);
 	                        out.flush();
 	                    } catch(Exception e) {

@@ -20,6 +20,10 @@ public class WCPLatticeNormalProcess extends AbstractNormalProcess{
 	
 	private boolean localPredicate;
 	
+	private boolean tfirstflag;
+	
+	private boolean ffirstflag;
+	
 	private Map<String, Long> currentMessageCount;
 
 	public WCPLatticeNormalProcess(String name, String[] checkers,
@@ -33,14 +37,25 @@ public class WCPLatticeNormalProcess extends AbstractNormalProcess{
             currentMessageCount.put(checkers[i], new Long(0));
         }
         localPredicate=false;
+        
+        tfirstflag=true;
+        ffirstflag=true;
 	}
 
 	@Override
 	public void action(boolean value) {
-		if(value==true){
+
+		if((value==true)&&tfirstflag){
+			tfirstflag=false;
+			ffirstflag=true;
 			localPredicate=true;
+			
+			//send message to other normal process
+            broadcast(MessageType.Control, null);
+            
 			//update vector clock
 			currentClock.increment(id);
+			
 			//localState changed, send localState to checker
 			LatticeVectorClock clock=new LatticeVectorClock(currentClock);
 			LatticeMessageContent content=new LatticeMessageContent(clock,value);
@@ -48,11 +63,16 @@ public class WCPLatticeNormalProcess extends AbstractNormalProcess{
                 String checker = checkers[i];
                 send(MessageType.Detection, checker, content);
             }
-			//send message to other normal process
-            broadcast(MessageType.Control, null);
-		}else if(value==false){
+			
+		}else if((value==false)&&ffirstflag){
+			ffirstflag=false;
+			tfirstflag=true;
 			localPredicate=false;
+			
+			//update vector clock
 			currentClock.increment(id);
+			
+			//localState changed, send localState to checker
 			LatticeVectorClock clock=new LatticeVectorClock(currentClock);
 			LatticeMessageContent content=new LatticeMessageContent(clock,value);
 			for(int i = 0; i < checkers.length; i++) {
@@ -103,17 +123,19 @@ public class WCPLatticeNormalProcess extends AbstractNormalProcess{
 
 	@Override
 	public void receiveMsg(Message message) {
+		tfirstflag=true;
+		ffirstflag=true;
 		//update the vector clock
-		currentClock.increment(id);
 		VectorClock timestamp = message.getTimestamp();
         currentClock.update(timestamp);
+        
         //localState changed, send localState to checker
-        LatticeVectorClock clock=new LatticeVectorClock(currentClock);
+        /*LatticeVectorClock clock=new LatticeVectorClock(currentClock);
 		LatticeMessageContent content=new LatticeMessageContent(clock,localPredicate);
 		for(int i = 0; i < checkers.length; i++) {
             String checker = checkers[i];
             send(MessageType.Detection, checker, content);
-        }
+        }*/
 	}
 
 }

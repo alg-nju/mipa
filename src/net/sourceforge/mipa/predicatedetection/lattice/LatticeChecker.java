@@ -1,10 +1,15 @@
 package net.sourceforge.mipa.predicatedetection.lattice;
 
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.*;
+
 import net.sourceforge.mipa.ResultCallback;
 import net.sourceforge.mipa.components.Message;
 import net.sourceforge.mipa.predicatedetection.AbstractChecker;
+
+import static config.Config.LOG_DIRECTORY;
+import static config.Debug.DEBUG;
 
 public abstract class LatticeChecker extends AbstractChecker {
 
@@ -27,6 +32,8 @@ public abstract class LatticeChecker extends AbstractChecker {
 	private ArrayList<ArrayList<Message>> msgBuffer;
 
 	private long[] currentMessageCount;
+	////////////////////////////
+	private PrintWriter out=null;
 
 	public LatticeChecker(ResultCallback application, String checkerName,
 			String[] normalProcesses) {
@@ -34,6 +41,7 @@ public abstract class LatticeChecker extends AbstractChecker {
 		super(application, checkerName, normalProcesses);
 
 		dimension = normalProcesses.length;
+		currentMessageCount = new long[normalProcesses.length];
 		globalState = new LocalState[dimension];
 		for (int i = 0; i < dimension; i++) {
 			LatticeVectorClock vc = new LatticeVectorClock(dimension);
@@ -43,6 +51,7 @@ public abstract class LatticeChecker extends AbstractChecker {
 		stateSet = new ArrayList<ArrayList<LocalState>>();
 		buffer = new ArrayList<ArrayList<LocalState>>();
 		max = new ArrayList<LocalState>();
+		msgBuffer = new ArrayList<ArrayList<Message>>();
 
 		String[] s = new String[dimension];
 		for (int i = 0; i < dimension; i++) {
@@ -51,11 +60,18 @@ public abstract class LatticeChecker extends AbstractChecker {
 			buffer.add(new ArrayList<LocalState>());
 			buffer.get(i).add(globalState[i]);
 			max.add(globalState[i]);
+			msgBuffer.add(new ArrayList<Message>());
 			s[i] = "0";
 		}
 
 		startNode = createNode(globalState,s);
 		currentNode = startNode;
+		////////////////////////////
+		try {
+            out = new PrintWriter(LOG_DIRECTORY + "/checker.log");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 	}
 
@@ -84,7 +100,23 @@ public abstract class LatticeChecker extends AbstractChecker {
 							.getLatticeMessageContent();
 					LocalState localstate = new LocalState(id,
 							content.getlvc(), content.getlocalPredicate());
+					/////////////////////////////
+					try {
+                        out.println(mess.getMessageID()+", "+normalProcess+", "+content.getlocalPredicate()+", "+content.getlvc().toString());
+                        out.flush();
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+					
 					boolean b = buffer(localstate);
+					/////////////////////////////
+					try {
+                        out.println("whether generate lattice : "+b);
+                        out.flush();
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                    
 					if (b) {
 						check(startNode,currentNode);
 					}
@@ -135,6 +167,14 @@ public abstract class LatticeChecker extends AbstractChecker {
 			if (b) {
 				buffer.get(pID).remove(0);
 				buffer.get(pID).add(state);
+/////////////////////////////
+				try {
+                    out.println("to call expandLattice(state), state's vector clcok is"+state.vc.toString());
+                    out.flush();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+				
 				expandLattice(state);
 				result = true;
 
@@ -151,6 +191,13 @@ public abstract class LatticeChecker extends AbstractChecker {
 							}
 							if (bo) {
 								buffer.get(i).remove(0);
+	/////////////////////////////
+								try {
+				                    out.println("to call expandLattice(state), state's vector clcok is"+state.vc.toString());
+				                    out.flush();
+				                } catch(Exception e) {
+				                    e.printStackTrace();
+				                }
 								expandLattice(buffer.get(i).get(0));
 							} else {
 								break;
@@ -160,8 +207,22 @@ public abstract class LatticeChecker extends AbstractChecker {
 				}
 			} else {
 				buffer.get(pID).add(state);
+/////////////////////////////
+				try {
+                    out.println("store in buffer, state's vector clcok is"+state.vc.toString());
+                    out.flush();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
 			}
 		} else {
+/////////////////////////////
+			try {
+                out.println("store in buffer, state's vector clcok is"+state.vc.toString());
+                out.flush();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
 			buffer.get(pID).add(state);
 		}
 		return result;
@@ -240,6 +301,18 @@ public abstract class LatticeChecker extends AbstractChecker {
 		currentNode.next.add(node);
 		node.previous.add(currentNode);
 		currentNode = node;
+		
+/////////////////////////////
+		try {
+            out.print("created new node: ");
+            for(int m=0;m<dimension;m++){
+            	String end = m + 1 != dimension ? " " : "\r\n";
+            	out.print(node.getID()[m]+end);
+            }
+            out.flush();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
 		updateMax(state);
 		if (max.size() > 0) { // generate Lattice
@@ -299,6 +372,19 @@ public abstract class LatticeChecker extends AbstractChecker {
 									break;
 								}
 								// if not created, add into the lattice.
+								
+	/////////////////////////////
+								try {
+						            out.print("inside created new node: ");
+						            for(int m=0;m<dimension;m++){
+						            	String end = m + 1 != dimension ? " " : "\r\n";
+						            	out.print(newnode.getID()[m]+end);
+						            }
+						            out.flush();
+						        } catch(Exception e) {
+						            e.printStackTrace();
+						        }
+								
 								currentNode.previous.add(newnode);
 								newnode.next.add(currentNode);
 								for (int j = 0; j < currentNode.previous.size() - 1; j++) {

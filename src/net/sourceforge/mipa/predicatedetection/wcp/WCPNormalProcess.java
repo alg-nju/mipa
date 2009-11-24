@@ -45,7 +45,7 @@ public class WCPNormalProcess extends AbstractNormalProcess {
 
     private static final long serialVersionUID = -4204158380607695058L;
 
-    //private boolean firstflag;
+    private boolean firstflag;
     
     private PrintWriter out;
     
@@ -55,7 +55,7 @@ public class WCPNormalProcess extends AbstractNormalProcess {
         super(name, checkers, normalProcesses);
         // TODO Auto-generated constructor stub
         currentClock = new WCPVectorClock(normalProcesses.length);
-        //currentClock.increment(id);
+        currentClock.increment(id);
         
         // TODO Auto-generated constructor stub
         currentMessageCount = new HashMap<String, Long>();
@@ -63,7 +63,7 @@ public class WCPNormalProcess extends AbstractNormalProcess {
             currentMessageCount.put(checkers[i], new Long(0));
         }
         
-        //firstflag = true;
+        firstflag = true;
         
         if(ENABLE_PHYSICAL_CLOCK) {
             try {
@@ -77,11 +77,10 @@ public class WCPNormalProcess extends AbstractNormalProcess {
     @Override
     public void action(boolean value) {
         // TODO Auto-generated method stub
-        if(value == true) {
-            currentClock.increment(id);
+        if(value == true && firstflag) {
             WCPVectorClock wcpVectorClock= new WCPVectorClock(currentClock);
             WCPMessageContent wcpMessageContent = new WCPMessageContent(wcpVectorClock);
-           
+            
             if(ENABLE_PHYSICAL_CLOCK) {
                 IDManager idManager = MIPAResource.getIDManager();
                 try {
@@ -99,22 +98,18 @@ public class WCPNormalProcess extends AbstractNormalProcess {
                 String checker = checkers[i];
                 send(MessageType.Detection, checker, wcpMessageContent);
             }
-            //firstflag = false;
+            
+            firstflag = false;
             broadcast(MessageType.Control, null);
-
-            //if(DEBUG) {
-            //    System.out.println(name + " firstflag: false");
-            //}
-        }
-        else{
             currentClock.increment(id);
+            
         }
     }
 
     @Override
     public void application() {
         // TODO Auto-generated method stub
-
+        
     }
 
     @Override
@@ -122,7 +117,6 @@ public class WCPNormalProcess extends AbstractNormalProcess {
         // TODO Auto-generated method stub
         VectorClock timestamp = message.getTimestamp();
         currentClock.update(timestamp);
-        currentClock.increment(id);
     }
 
     private void send(MessageType type, String receiverName, WCPMessageContent content) {
@@ -148,15 +142,6 @@ public class WCPNormalProcess extends AbstractNormalProcess {
             e.printStackTrace();
         }
         
-        /*
-        if(!receiverName.equals("checker")) {
-            firstflag = true;//firstflag should be set as true when sending messages to NormalProcesses
-            if(DEBUG) {
-                System.out.println(name + " firstflag: true.");
-            }
-            currentClock.increment(id);
-        }
-        */
     }
     
     private void broadcast(MessageType type, WCPMessageContent content) {
@@ -165,5 +150,7 @@ public class WCPNormalProcess extends AbstractNormalProcess {
                 send(type, normalProcesses[i], content);
             }
         }
+        firstflag = true;
+        
     }
 }

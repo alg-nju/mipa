@@ -2,5 +2,5 @@
 <!DOCTYPE naming SYSTEM "config.dtd">
 <naming>
 	<address>127.0.0.1</address>
-	<port>1099</port>
+	<port>1100</port>
 </naming>

@@ -27,9 +27,11 @@ import net.sourceforge.mipa.ResultCallback;
 import net.sourceforge.mipa.components.Communication;
 import net.sourceforge.mipa.components.MIPAResource;
 import net.sourceforge.mipa.naming.Naming;
+import net.sourceforge.mipa.predicatedetection.lattice.wcp.WCPLatticeChecker;
 import net.sourceforge.mipa.predicatedetection.oga.OGASubChecker;
 import net.sourceforge.mipa.predicatedetection.oga.OGATopChecker;
 import net.sourceforge.mipa.predicatedetection.scp.SCPChecker;
+import net.sourceforge.mipa.predicatedetection.wcp.WCPChecker;
 
 /**
  * 
@@ -96,6 +98,23 @@ public class CheckerFactory {
             e.printStackTrace();
         }
     }
+    
+    public static void debugChecker(String callback, String checkerName,
+    								String[] normalProcesses) {
+    	try {
+    		ResultCallback application = (ResultCallback) server.lookup(callback);
+    		WCPChecker wcpChecker = new WCPChecker(application, checkerName,
+					normalProcesses);
+    		Communication wcpcheckerStub 
+    							= (Communication) UnicastRemoteObject
+    												.exportObject(wcpChecker,
+    														0);
+    		server.bind(checkerName, wcpcheckerStub);
+    		
+    	} catch(Exception e) {
+    		
+    	}
+    }
 
     // FIXME this function should split to scpChecker, wcpChecker, LPChecker,
     // etc.
@@ -125,7 +144,17 @@ public class CheckerFactory {
             case LP:
 
             case WCP:
-
+            	WCPLatticeChecker wcpLatticeChecker = new WCPLatticeChecker(application, checkerName,
+            										normalProcesses);
+            	Communication wcpLatticecheckerStub 
+            						= (Communication) UnicastRemoteObject
+            												.exportObject(wcpLatticeChecker,
+            																0);
+            	server.bind(checkerName, wcpLatticecheckerStub);
+            	if (DEBUG) {
+            		System.out.println("binding checker " + checkerName);
+            	}
+            	break;
             default:
                 System.out.println("Type has not been defined.");
             }

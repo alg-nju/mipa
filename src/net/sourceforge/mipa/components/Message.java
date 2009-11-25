@@ -59,6 +59,7 @@ public class Message implements Serializable {
     /** SCP message content */
     private SCPMessageContent scpMessageContent = null;
     
+
     /** OGA message content */
     private OGAMessageContent ogaMessageContent = null;
     

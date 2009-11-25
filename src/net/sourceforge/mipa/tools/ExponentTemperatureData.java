@@ -34,7 +34,7 @@ public class ExponentTemperatureData {
         String outputFile_1 = "data/temperature_1_temp";
         PrintWriter output = null;
         PrintWriter output_1 = null;
-        double intervalLambda = 1.0 / 55;
+        double intervalLambda = 1.0 / 10;
         double intervalGapLambda = 1.0 / 5;
         
         // double threshold = 30;

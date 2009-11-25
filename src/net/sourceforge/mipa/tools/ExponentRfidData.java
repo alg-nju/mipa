@@ -41,7 +41,7 @@ public class ExponentRfidData {
         String outputFile_1 = "data/RFID_1_temp";
         PrintWriter output = null;
         PrintWriter output_1 = null;
-        double intervalLambda = 1.0 / 55;
+        double intervalLambda = 1.0 / 10;
         double intervalGapLambda = 1.0 / 5;
         
         
@@ -71,7 +71,7 @@ public class ExponentRfidData {
                     for(int k = 0; k < (int) intervalLength; k++) {
                         stream += "1";
                     }
-                    System.out.println(j);
+                    //System.out.println(j);
                 }
                 output.println(stream);
                 

@@ -11,7 +11,17 @@
       </LP>
       <LP>
 	<formula>
-	  <atom operator="not-contain" name="RFID" value="tag_00001" />
+	  <atom operator="contain" name="RFID" value="tag_00001" />
+	</formula>
+      </LP>
+      <LP>
+	<formula>
+	  <atom operator="less-than" name="temperature_1" value="27" />
+	</formula>
+      </LP>
+      <LP>
+	<formula>
+	  <atom operator="not-contain" name="RFID_1" value="tag_00001" />
 	</formula>
       </LP>
     </CGS>

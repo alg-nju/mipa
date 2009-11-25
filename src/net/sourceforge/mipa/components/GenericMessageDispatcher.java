@@ -119,7 +119,9 @@ public abstract class GenericMessageDispatcher
         
         try {
             if (comTable.containsKey(message.getReceiverID())) {
-                comTable.get(message.getReceiverID()).receive(message);
+                comTable.get(
+                		message.getReceiverID())
+                .receive(message);
             } else {
                 Communication receiver = (Communication) server
                                                                .lookup(message

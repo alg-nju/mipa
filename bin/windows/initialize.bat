@@ -1,3 +1,3 @@
 set MIPA_HOME=.
 cd ..\..
-java -cp %MIPA_HOME%\build\classes\;%CLASSPATH% net.sourceforge.mipa.Initialize
+java -Xmx1024M -cp "%MIPA_HOME%\build\classes\;%classpath%" net.sourceforge.mipa.Initialize

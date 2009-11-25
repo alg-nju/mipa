@@ -90,8 +90,13 @@ public class ECAInitialize {
             resources.add(sensorPlugin.load("config/sensors/RFID.xml"));
             resources.add(sensorPlugin.load("config/sensors/temperature_1.xml"));
             resources.add(sensorPlugin.load("config/sensors/RFID_1.xml"));
+      /*      resources.add(sensorPlugin.load("config/sensors/temperature_2.xml"));
+            resources.add(sensorPlugin.load("config/sensors/RFID_2.xml"));
+            resources.add(sensorPlugin.load("config/sensors/temperature_3.xml"));
+            resources.add(sensorPlugin.load("config/sensors/RFID_3.xml"));
+            
             resources.add(sensorPlugin.load("config/sensors/light.xml"));
-            resources.add(sensorPlugin.load("config/sensors/light_1.xml"));
+            resources.add(sensorPlugin.load("config/sensors/light_1.xml"));*/
             
             if (DEBUG) {
                 System.out.println("resources value: ");

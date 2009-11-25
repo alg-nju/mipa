@@ -129,6 +129,7 @@ public class WCPLatticeNormalProcess extends AbstractNormalProcess{
 		VectorClock timestamp = message.getTimestamp();
         currentClock.update(timestamp);
         
+        //fix Issue 10, add check message sending
         //localState changed, send localState to checker
         LatticeVectorClock clock=new LatticeVectorClock(currentClock);
 		LatticeMessageContent content=new LatticeMessageContent(clock,localPredicate);

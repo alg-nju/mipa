@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="mipa.principle.sensor_agent">
+<chapter id="mipa.principle.sensor-agent">
   <title>Sensor Agent</title>
   
   <para>This chapter is about the design of sensor agent.</para>
+
+  <sect1 id="mipa.principle.sensor-agent.plugin">
+  
+  </sect1>
+
+  <sect1 id="mipa.principle.sensor-agent.example">
+  
+  </sect1>
 </chapter>

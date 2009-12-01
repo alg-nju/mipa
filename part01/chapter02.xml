@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="mipa.a-simple-example">
+  <title>A simple example to MIPA</title>
+
+  <para>A simple example is presented here.</para>
+
+  <sect1 id="mipa.a-simple-example.application">
+	<title>An example of an application</title>
+  
+	<para>This section is about how to write an application with callback interface.</para>
+  </sect1>
+
+  <sect1 id="mipa.a-simple-example.predicate">
+	<title>An example of a predicate</title>
+  
+	<para>This section is about how to write the predicate description with PDCC framework.</para>
+  </sect1>
+
+  <sect1 id="mipa.a-simple-example.sensor">
+	<title>An example of sensors</title>
+	
+	<para>This section is about how to write some sensors with plug-in mechanism.</para>
+  </sect1>
+
+  <sect1 id="mipa.a-simple-example.system-config">
+	<title>An example of system configurations</title>
+  
+	<para>This section is about how to configure files of MIPA system.</para>
+  </sect1>
+</chapter>

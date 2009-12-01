@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="mipa.principle.pd">
+  <title>Predicate Detection (PD)</title>
+  
+  <para>This chapter is about the principle of PD.</para>
+
+  <sect1 id="mipa.principle.pd.workflow">
+	<title>Workflow of PD</title>
+  
+	<para>An overview of workflow of PD will be described here.</para>
+  </sect1>
+
+  <sect1 id="mipa.principle.pd.predicate-parser">
+	<title>Predicate parser</title>
+  
+	<para>Predicate parser module will be explained in this section.</para>
+  </sect1>
+
+  <sect1 id="mipa.principle.pd.group-manager">
+	<title>Group manager</title>
+  
+	<para>Group manager module will be explained in this section.</para>
+  </sect1>
+
+  <sect1 id="mipa.principle.pd.message-dispatcher">
+	<title>Message dispatcher</title>
+  
+	<para>Message dispatcher module will be explained in this section.</para>
+  </sect1>
+</chapter>

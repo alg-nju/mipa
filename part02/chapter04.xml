@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="mipa.usage.developer">
+  <title>Develop new predicate detection algorithm</title>
+  
+  <para>This chapter is for developers who use MIPA.</para>
+
+  <sect1 id="mipa.usage.developer.non-checker">
+	<title>How to write a non-checker process?</title>
+  
+	<para>This section describes interfaces which the non-checker process can
+	access. Steps of creating a new non-checker process will be presented here.</para>
+  </sect1>
+
+  <sect1 id="mipa.usage.developer.checker">
+	<title>How to write a checker process?</title>
+  
+	<para>This section describes interfaces which the checker prcoess can
+	access. Steps of creating a new checker process will be presented here.</para>
+  </sect1>
+</chapter>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="mipa.usage.user">
+  <title>How to use MIPA?</title>
+  
+  <para>This chapter is for users who use MIPA.</para>
+
+  <sect1 id="mipa.usage.user.application">
+	<title>Write an application</title>
+  
+	<para>This section is about how to write an application with callback interface.</para>
+  </sect1>
+
+  <sect1 id="mipa.usage.user.predicate">
+	<title>Specify a predicate</title>
+  
+	<para>This section is about how to write the predicate description with PDCC framework.</para>
+  </sect1>
+
+  <sect1 id="mipa.usage.user.sensor">
+	<title>Specify sensors</title>
+	
+	<para>This section is about how to write some sensors with plug-in mechanism.</para>
+  </sect1>
+
+  <sect1 id="mipa.usage.user.system-config">
+	<title>System configuration</title>
+  
+	<para>This section is about how to configure files of MIPA system.</para>
+  </sect1>
+</chapter>

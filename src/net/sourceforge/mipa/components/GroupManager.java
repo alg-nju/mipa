@@ -206,7 +206,8 @@ public class GroupManager {
             
             System.out.println("\t local predicate: ");
             for(LocalPredicate lp : localPredicateToNormalProcess.keySet()) {
-                System.out.println("\t\t" + lp.getName() + " : " + localPredicateToNormalProcess.get(lp));
+                //System.out.println("\t\t" + lp.getName() + " : " + localPredicateToNormalProcess.get(lp));
+                System.out.println("\t\t" + lp.toString() + " : " + localPredicateToNormalProcess.get(lp));
             }
         }
         

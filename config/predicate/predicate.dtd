@@ -19,7 +19,7 @@
 <!ATTLIST quantifier value (universal|existential) #REQUIRED>
 
 <!ELEMENT binary EMPTY>
-<!ATTLIST binary value (conjunction|disjunction|impliction) #REQUIRED>
+<!ATTLIST binary value (conjunction|disjunction|imply) #REQUIRED>
 
 <!ELEMENT unary EMPTY>
 <!ATTLIST unary value (not) #IMPLIED>

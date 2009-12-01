@@ -19,8 +19,11 @@
  */
 package net.sourceforge.mipa.components;
 
+import java.util.ArrayList;
+
 import net.sourceforge.mipa.eca.ECAManager;
 import net.sourceforge.mipa.naming.Naming;
+import net.sourceforge.mipa.predicatedetection.Atom;
 import net.sourceforge.mipa.predicatedetection.LocalPredicate;
 
 /**
@@ -42,19 +45,31 @@ public class Broker {
     
     public void registerLocalPredicate(LocalPredicate lp, String normalProcessId, Group g) {
         try {
-            String lowContext = contextModeling.getLowContext(lp.getName());
-            String ecaManagerID = contextRetrieving.getEntityId(lowContext);
-            
-            // reset the name of local predicate from high level context to low level context.
-            lp.setName(lowContext);
-            lp.setValueType(contextModeling.getValueType(lowContext));
+                ArrayList<Atom> arrayList = lp.getAtoms();
+                String ecaManagerID = contextRetrieving.getEntityId(contextModeling.getLowContext(arrayList.get(0).getName()));
+                for(int i=0;i<arrayList.size();i++)
+                {
+                    Atom atom = arrayList.get(i);
+                    String lowContext = contextModeling.getLowContext(atom.getName());
+                    String ecaManagerIDNew = contextRetrieving.getEntityId(lowContext);
+                    if(!ecaManagerIDNew.equals(ecaManagerID))
+                    {
+                        System.out.println("The sensors "+arrayList.get(0).getName()
+                                                         +" and "
+                                                         +arrayList.get(i).getName()
+                                                         +" are in different ECA.");
+                    }
+                    // reset the name of local predicate from high level context to low level context.
+                    atom.setName(lowContext);
+                    atom.setValueType(contextModeling.getValueType(lowContext));
+                }
 
-            Naming server = MIPAResource.getNamingServer();
-            ECAManager ecaManager = (ECAManager) server.lookup(ecaManagerID);
+                Naming server = MIPAResource.getNamingServer();
+                ECAManager ecaManager = (ECAManager) server.lookup(ecaManagerID);
 
-            System.out.println("find eca manager successfully.");
-            System.out.println(ecaManagerID);
-            ecaManager.registerLocalPredicate(lp, normalProcessId, g);
+                System.out.println("find eca manager successfully.");
+                System.out.println(ecaManagerID);
+                ecaManager.registerLocalPredicate(lp, normalProcessId, g);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -20,6 +20,11 @@
 package net.sourceforge.mipa.eca;
 
 import static config.Debug.DEBUG;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import net.sourceforge.mipa.predicatedetection.Atom;
 import net.sourceforge.mipa.predicatedetection.LocalPredicate;
 
 /**
@@ -36,7 +41,8 @@ public class EmptyCondition extends Condition {
 
     public EmptyCondition(Listener action, LocalPredicate localPredicate) {
         this.action = action;
-        this.localPredicate = localPredicate;
+        map = new HashMap<String, ArrayList<Atom>>();
+        this.localPredicate = parseLocalPredicate(localPredicate);
     }
 
     /*
@@ -62,8 +68,8 @@ public class EmptyCondition extends Condition {
      */
     @Override
     public synchronized void update(String eventName, String[] values) {
-        boolean result = assign(eventName, values);
-
+        assign(eventName, values);
+        boolean result = localPredicate.getNodeValue();
         notifyListener(eventName, String.valueOf(result));
     }
 }

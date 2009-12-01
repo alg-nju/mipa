@@ -20,16 +20,16 @@
 package net.sourceforge.mipa.predicatedetection;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * The <code>Atom</code> class represents atom.
  *
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
-public class Atom implements Serializable {
-    //TODO implement completely predicate
-    
-    private static final long serialVersionUID = 1032369328241304696L;
+public class Atom extends Composite implements Serializable {
+
+    private static final long serialVersionUID = 1714713924256185778L;
 
     private String operator;
     
@@ -40,7 +40,12 @@ public class Atom implements Serializable {
     private String valueType;
     
     private boolean not;
-
+    
+    public Atom(NodeType type, String name) {
+        super(type, name);
+        // TODO Auto-generated constructor stub
+    }
+    
     /**
      * @param operator the operator to set
      */
@@ -110,7 +115,77 @@ public class Atom implements Serializable {
     public boolean isNot() {
         return not;
     }
-    
+
+    @Override
+    public ArrayList<Structure> getChildren() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void update(String[] values)
+    {
+        setLastValue(nodeValue);
+        if (valueType.equals("String") == true) {
+            // String operators
+            if (operator.equals("contain") == true) {
+                for (int i = 0; i < values.length; i++)
+                    if (value.equals(values[i]) == true)
+                    {
+                        nodeValue = true;
+                        return;
+                    }
+            } else if(operator.equals("not-contain") == true) {
+                for(int i = 0; i < values.length; i++)
+                    if(value.equals(values[i]) == true)
+                    {
+                        nodeValue = false;
+                        return;
+                    }
+                nodeValue = true;
+                return;
+            } else {
+                System.out.println("The operator of String has not been defined.");
+            }
+            
+        } else if (valueType.equals("Double") == true) {
+            // Float operators
+            double sensorValue = Double.parseDouble(values[0]);
+            double threshold = Double.parseDouble(value);
+            
+            if(operator.equals("great-than") == true) {
+                if(sensorValue > threshold)
+                {
+                    nodeValue = true;
+                    return;
+                }
+            } else if(operator.equals("equals") == true) {
+                if(sensorValue == threshold)
+                {
+                    nodeValue = true;
+                    return;
+                }
+            } else if(operator.equals("less-than") == true) {
+                if(sensorValue < threshold)
+                {
+                    nodeValue = true;
+                    return;
+                }
+            } else {
+                System.out.println("The operator of Float has not been defined.");
+            }
+        } /*else if(valueType.equals("Boolean") == true) {
+            
+          else if(valueType.equals("Integer") ==  true) {
+          
+          }
+          
+          else if (valueType.equals("") == true) {
+          
+          }
+        } */else {
+            System.out.println("value type is undefined.");
+        }
+    }
     /*
     //FIXME this part is terribly coded.
     public boolean value(String value) {

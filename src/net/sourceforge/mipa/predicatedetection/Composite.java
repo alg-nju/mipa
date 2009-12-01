@@ -28,15 +28,21 @@ import java.util.ArrayList;
 public class Composite implements Structure {
 
     private ArrayList<Structure> children;
-
+    
+    private Structure father;
+    
     private NodeType type;
 
-    private String name;
+    private String nodeName;
+    
+    protected boolean nodeValue = false;
+    
+    protected boolean lastValue;
 
-    public Composite(NodeType type, String name) {
+    public Composite(NodeType type, String nodeName) {
         children = new ArrayList<Structure>();
         this.type = type;
-        this.name = name;
+        this.nodeName = nodeName;
     }
 
     @Override
@@ -71,19 +77,43 @@ public class Composite implements Structure {
      * @param name
      *            the name to set
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
     }
 
     /**
      * @return the name
      */
-    public String getName() {
-        return name;
+    public String getNodeName() {
+        return nodeName;
     }
 
     @Override
     public NodeType getNodeType() {
+        // TODO Auto-generated method stub
         return type;
+    }
+
+    public void setFather(Structure father) {
+        this.father = father;
+    }
+
+    public Structure getFather() {
+        return father;
+    }
+
+    public void setNodeValue(boolean nodeValue) {
+        this.nodeValue = nodeValue;
+    }
+
+    public boolean getNodeValue() {
+        return nodeValue;
+    }
+    public boolean getLastValue() {
+        return lastValue;
+    }
+
+    public void setLastValue(boolean lastValue) {
+        this.lastValue = lastValue;
     }
 }

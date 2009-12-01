@@ -26,5 +26,16 @@ package net.sourceforge.mipa.predicatedetection;
 public enum NodeType {
     GSE,
     CGS,
-    LP
+    LP,
+    FORMULA,
+    ATOM,
+    QUANTIFIER,
+    BINARY,
+    UNARY,
+    UNIVERSAL,
+    EXISTENTIAL,
+    NOT,
+    CONJUNCTION,
+    DISJUNCTION,
+    IMPLY    
 }

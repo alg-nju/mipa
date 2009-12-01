@@ -19,7 +19,6 @@
  */
 package net.sourceforge.mipa.predicatedetection;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -27,9 +26,9 @@ import java.util.ArrayList;
  *
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
-public class Atom extends Composite implements Serializable {
+public class Atom extends Composite {
 
-    private static final long serialVersionUID = 1714713924256185778L;
+    private static final long serialVersionUID = 6454409027143184894L;
 
     private String operator;
     

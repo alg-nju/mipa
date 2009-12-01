@@ -1,10 +1,9 @@
 package net.sourceforge.mipa.predicatedetection;
 
-import java.io.Serializable;
 
-public class Connector extends Composite implements Serializable {
+public class Connector extends Composite{
 
-    private static final long serialVersionUID = 182840393628790171L;
+    private static final long serialVersionUID = 2618026284487183097L;
 
     private NodeType operator;
     

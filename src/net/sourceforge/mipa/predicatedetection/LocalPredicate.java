@@ -19,6 +19,7 @@
  */
 package net.sourceforge.mipa.predicatedetection;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -26,7 +27,7 @@ import java.util.ArrayList;
  *
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
-public class LocalPredicate implements Structure {
+public class LocalPredicate implements Structure,Serializable {
 
     private static final long serialVersionUID = -1765170172935638206L;
     

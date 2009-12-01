@@ -19,14 +19,14 @@
 					<formula>
 						<quantifier value="universal"/>
 						<formula>
-							<atom operator="great-than" name="temperature" value="30" />
+							<atom operator="great-than" name="temperature" value="25" />
 						</formula>
 					</formula>
 					<binary value="conjunction"/>
 					<formula>
 						<unary value="not"/>
 						<formula>
-							<atom operator="great-than" name="temperature" value="25" />
+							<atom operator="great-than" name="temperature" value="27" />
 						</formula>
 					</formula>
 				</formula>

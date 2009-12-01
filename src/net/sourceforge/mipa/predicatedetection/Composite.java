@@ -19,13 +19,16 @@
  */
 package net.sourceforge.mipa.predicatedetection;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * 
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
-public class Composite implements Structure {
+public class Composite implements Structure,Serializable {
+
+    private static final long serialVersionUID = -1344580735973602117L;
 
     private ArrayList<Structure> children;
     

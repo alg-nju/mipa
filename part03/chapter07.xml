@@ -5,18 +5,26 @@
   <para>This chapter is about the principle of ECA.</para>
 
   <sect1 id="mipa.principle.eca.condition">
-	<title></title>
+	<title>Condition</title>
+  
+	<para>Condition</para>
   </sect1>
 
   <sect1 id="mipa.principle.eca.source">
-	<title></title>
+	<title>Source</title>
+  
+	<para>Source</para>
   </sect1>
 
   <sect1 id="mipa.principle.eca.action">
-	<title></title>
+	<title>Action</title>
+  
+	<para>Action</para>
   </sect1>
 
   <sect1 id="mipa.principle.eca.non-checker">
-	<title></title>
+	<title>Non-Checker</title>
+  
+	<para>Non-Checker</para>
   </sect1>
 </chapter>

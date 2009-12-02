@@ -5,10 +5,14 @@
   <para>This chapter is about the design of sensor agent.</para>
 
   <sect1 id="mipa.principle.sensor-agent.plugin">
+	<title>Plug-in</title>
   
+	<para>Plug-in</para>
   </sect1>
 
   <sect1 id="mipa.principle.sensor-agent.example">
+	<title>Example</title>
   
+	<para>Example</para>
   </sect1>
 </chapter>

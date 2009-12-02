@@ -1,29 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="mipa.a-simple-example">
-  <title>A simple example to MIPA</title>
+  <title>Getting Started</title>
 
-  <para>A simple example is presented here.</para>
+  <para>In this chapter, we will develop a simple case on MIPA middleware. Just
+  echoes 'Hello World!' when the specific predicate is concerned.
+  </para>
+  
+  <para>There are four steps that a user should follow for a runnable
+  application.
+  </para>
 
+  <orderedlist>
+	<listitem><para>Implementing the callback interface for an application
+	  </para></listitem>
+	<listitem><para>Specifying a predicate</para></listitem>
+	<listitem><para>Writing agents for sensors</para></listitem>
+	<listitem><para>Configuring system</para></listitem>
+  </orderedlist>
   <sect1 id="mipa.a-simple-example.application">
-	<title>An example of an application</title>
+	<title>Implementing the Callback Interface for an Application</title>
   
 	<para>This section is about how to write an application with callback interface.</para>
+  
+	<screen>
+public class Application extends AbstractApplication {
+
+      public void callback(String value) throws RemoteException {
+
+      }
+}
+	</screen>
+  
   </sect1>
 
   <sect1 id="mipa.a-simple-example.predicate">
-	<title>An example of a predicate</title>
+	<title>Specifying a Predicate</title>
   
 	<para>This section is about how to write the predicate description with PDCC framework.</para>
   </sect1>
 
   <sect1 id="mipa.a-simple-example.sensor">
-	<title>An example of sensors</title>
+	<title>Writing Agents for Sensors</title>
 	
 	<para>This section is about how to write some sensors with plug-in mechanism.</para>
   </sect1>
 
   <sect1 id="mipa.a-simple-example.system-config">
-	<title>An example of system configurations</title>
+	<title>Configuring System</title>
   
 	<para>This section is about how to configure files of MIPA system.</para>
   </sect1>

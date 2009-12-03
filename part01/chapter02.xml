@@ -2,52 +2,283 @@
 <chapter id="mipa.a-simple-example">
   <title>Getting Started</title>
 
-  <para>In this chapter, we will develop a simple case on MIPA middleware. Just
+  <para>In this chapter, we will develop a simple case on the MIPA middleware. Just
   echoes 'Hello World!' when the specific predicate is concerned.
   </para>
   
-  <para>There are four steps that a user should follow for a runnable
+  <important>
+	<para>All programs in the MIPA are written in Java.</para>
+	<para>All configuration files are written in XML.</para>
+  </important>
+  
+  <para>There are four steps that a user should follow for building a runnable
   application.
   </para>
 
   <orderedlist>
+	<listitem><para>Specifying a predicate</para></listitem>
 	<listitem><para>Implementing the callback interface for an application
 	  </para></listitem>
-	<listitem><para>Specifying a predicate</para></listitem>
 	<listitem><para>Writing agents for sensors</para></listitem>
 	<listitem><para>Configuring system</para></listitem>
+	<listitem><para>Starting system</para></listitem>
   </orderedlist>
-  <sect1 id="mipa.a-simple-example.application">
-	<title>Implementing the Callback Interface for an Application</title>
   
-	<para>This section is about how to write an application with callback interface.</para>
-  
-	<screen>
-public class Application extends AbstractApplication {
-
-      public void callback(String value) throws RemoteException {
-
-      }
-}
-	</screen>
-  
-  </sect1>
-
   <sect1 id="mipa.a-simple-example.predicate">
 	<title>Specifying a Predicate</title>
   
-	<para>This section is about how to write the predicate description with PDCC framework.</para>
+	<para>We provide <link linkend="mipa.principle.predicate.definition">PDCC
+	  framework</link> for users to specify their predicates.
+	The predicates describe the events of the users concerned. Here is an
+	example of predicate definition.
+	</para>
+  
+	<programlisting>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE predicate SYSTEM "predicate.dtd"&gt;
+&lt;predicate type="SCP"&gt;
+  &lt;prefix value="def" /&gt;
+  &lt;GSE value="conjunction"&gt;
+    &lt;CGS value="conjunction"&gt;
+      &lt;LP&gt;
+	&lt;formula&gt;
+	  &lt;atom operator="great-than" name="light" value="500" /&gt;
+	&lt;/formula&gt;
+      &lt;/LP&gt;
+      &lt;LP&gt;
+	&lt;formula&gt;
+	  &lt;atom operator="not-contain" name="RFID" value="tag_00001" /&gt;
+	&lt;/formula&gt;
+      &lt;/LP&gt;
+    &lt;/CGS&gt;
+    &lt;global&gt;g&lt;/global&gt;
+  &lt;/GSE&gt;
+&lt;/predicate&gt;
+</programlisting>
+	<para>
+	  In this example, the user interests the events of light and RFID. If
+	  <code>light &gt; 500</code> and <code>RFID not-contain tag_00001</code>
+	occur simultaneously, the user should be notified.
+	</para>
+  </sect1>
+
+  
+  <sect1 id="mipa.a-simple-example.application">
+	<title>Implementing Callback Interface</title>
+  
+	<para>The application of the MIPA should implement the callback interface 
+	which the MIPA call for notifying it.</para>
+	
+	<para>In this example, when the predicate is true, the application just
+	  prints "Hello World!". The callback code is shown as below.
+	</para>
+  
+	<programlisting>
+import net.sourceforge.mipa.application.AbstractApplication;
+
+public class Application extends AbstractApplication {
+
+      public void callback(String value) throws RemoteException {
+            System.out.println("Hello World!");
+      }
+}
+</programlisting>
+  
   </sect1>
 
   <sect1 id="mipa.a-simple-example.sensor">
 	<title>Writing Agents for Sensors</title>
 	
-	<para>This section is about how to write some sensors with plug-in mechanism.</para>
+	<para>This step is optional. It dues to the existing sensors. If the
+	existing contexts satisfy the predicate, you just skip this section.
+	</para>
+	
+	<para>MIPA supports sensors through the plug-in mode. If there is no existing
+	context that the predicate uses. All you should do is writing the sensors
+	which the context relates to. In order to archive this target, you should
+	write sensors classes and configure them.
+	</para>
+  
+	<para>Here is a simulated RFID sensor class. All sensors in the MIPA
+	  middleware should implement the interface of <code>Sensor</code>.
+	</para>
+	
+	<programlisting>
+public class SimulationRFID implements Sensor {
+
+    /** time gap between continuous data generations. */
+    private long gap;
+
+    /** tags that RFID reader manages. */
+    private ArrayList&lt;String&gt; tags;
+
+    /** data source per tag. */
+    private ArrayList&lt;String&gt; sources;
+
+    /** data source indicator per tag. */
+    private int[] indicators;
+
+    public SimulationRFID(Object args) {
+
+        try {
+            BufferedReader source = new BufferedReader(
+                                               new FileReader((String) Array.get(args, 0)));
+            
+            gap = Long.parseLong(source.readLine());
+            int num = Integer.parseInt(source.readLine());
+            tags = new ArrayList&lt;String&gt;();
+            sources = new ArrayList&lt;String&gt;();
+            indicators = new int[num];
+            
+            for (int i = 0; i &lt; num; i++) {
+                String tag = source.readLine();
+                tags.add(tag);
+            }
+            for (int i = 0; i &lt; num; i++) {
+                String data = source.readLine();
+                sources.add(data);
+            }
+
+            for (int i = 0; i &lt; num; i++) {
+                indicators[i] = 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String[] getData() {
+        ArrayList&lt;String&gt; detectedTags = new ArrayList&lt;String&gt;();
+
+        for (int i = 0; i &lt; indicators.length; i++) {
+            String source = sources.get(i);
+            if (source.length() &lt;= indicators[i])
+                continue;
+            
+            if (source.charAt(indicators[i]) != '0')
+                detectedTags.add(tags.get(i));
+              
+            indicators[i]++;
+        }
+        
+        if (detectedTags.size() != 0) {
+            String[] detectedTagsArray = new String[detectedTags.size()];
+            detectedTags.toArray(detectedTagsArray);
+            return detectedTagsArray;
+        } else {
+            boolean end = true;
+            for(int i = 0; i &lt; indicators.length; i++) {
+                if(sources.get(i).length() &gt; indicators[i]) {
+                    end = false;
+                    break;
+                }
+            }
+            String[] results = {""};
+            if (end == true) results = null;
+            return results;
+        }
+    }
+
+    public long getGap() {
+        return gap;
+    }
+}
+</programlisting>
+	
+	<para>
+	After implementing the sensor class, the user is going to configure the
+	  sensor through a configuration file. All fields of the configuration file will
+	  be explained in <link linkend="mipa.usage.user.sensor">Chapter 3</link>.
+	</para>
+	<programlisting>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE sensor SYSTEM "sensor.dtd"&gt;
+&lt;sensor&gt;
+  &lt;name&gt;RFID&lt;/name&gt;
+  &lt;id&gt;RFID&lt;/id&gt;
+  &lt;class&gt;net.sourceforge.mipa.eca.sensor.SimulationRFID&lt;/class&gt;
+  &lt;location&gt;nju&lt;/location&gt;
+  &lt;ValueType&gt;String&lt;/ValueType&gt;
+  &lt;DataSchema type="push" /&gt;
+  &lt;DataDisseminate time="1" lazy="false" /&gt;
+  &lt;arguments&gt;
+	&lt;argument&gt;data/RFID&lt;/argument&gt;
+  &lt;/arguments&gt;
+&lt;/sensor&gt;
+</programlisting>
   </sect1>
 
   <sect1 id="mipa.a-simple-example.system-config">
 	<title>Configuring System</title>
   
-	<para>This section is about how to configure files of MIPA system.</para>
+	<para>Before we run the MIPA, the system should be configured. An example of
+	a system configuration file is shown as below. In this edition, we just
+	configure the IP and port of a naming service, usually it is the same as
+	  <link linkend="mipa.principle.pd">Predicate Detection Side</link>.
+	</para>
+	
+	<para>In this example, we choose <code>normal</code> mode of <code>check mode</code>.
+	</para>
+  
+	<programlisting>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE config SYSTEM "config.dtd"&gt;
+&lt;config&gt;
+	&lt;naming&gt;
+		&lt;address&gt;127.0.0.1&lt;/address&gt;
+		&lt;port&gt;1099&lt;/port&gt;
+	&lt;/naming&gt;
+	&lt;!-- normal or lattice --&gt;
+	&lt;checkmode&gt;normal&lt;/checkmode&gt;
+&lt;/config&gt;
+</programlisting>
+  </sect1>
+
+  <sect1 id="mipa.a-simple-example.start-system">
+	<title>Starting System</title>
+  
+	<para>OK, let's start the system.</para>
+  
+	<para>MIPA consists of two sides: <code>Predicate Detection Side</code> and
+	  <code>ECA Side</code>. At any time, there are one instance of the predicate
+	detection side and many instances of the ECA sides. All of them are running
+	in distributed environment.
+	</para>
+  
+	<para>Start scripts are located in <code>${MIPA Home}/bin</code>, it supports
+	both Linux and Windows operating systems. Let me take Linux as example.
+	</para>
+  
+	<para>The steps of starting <code>Predicate Detection Side</code>: (Please
+	  replace <code>${MIPA Home}</code> as the actual value in your system)</para>
+  
+	<orderedlist>
+	  <listitem><para><code>$cd ${MIPA Home}/bin/linux</code></para></listitem>
+	  <listitem><para><code>$./MIPAInitialize</code></para></listitem>
+	</orderedlist>
+  
+	<para>The naming service is also starting with <code>Predicate Detection Side</code></para>
+  
+	<para>You can start <code>ECA Side</code> in the same computer of <code>Predicate
+	  Detection Side</code> or in a new computer as you like.
+	</para>
+  
+	<para>The steps of starting an <code>ECA Side</code>:</para>
+  
+	<orderedlist>
+	  <listitem><para><code>$cd ${MIPA Home}/bin/linux</code></para></listitem>
+	  <listitem><para><code>$./ECAInitialize</code></para></listitem>
+	</orderedlist>
+  
+	<para>In the last step, an application should be started. We supply an example
+	whose start script is located in the same directory as others.
+	</para>
+  
+	<para>The steps of starting the example:</para>
+  
+	<orderedlist>
+	  <listitem><para><code>$cd ${MIPA Home}/bin/linux</code></para></listitem>
+	  <listitem><para><code>$./application 1</code></para></listitem>
+	</orderedlist>
   </sect1>
 </chapter>

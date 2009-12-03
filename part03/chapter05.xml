@@ -2,7 +2,9 @@
 <chapter id="mipa.principle.predicate">
   <title>Predicate Specification</title>
   
-  <para>This chapter is about the specification of predicate.</para>
+  <para>This chapter is about the specification of predicate.
+	<note>Under construction.</note>
+  </para>
 
   <sect1 id="mipa.principle.predicate.definition">
 	<title>PDCC framework</title>

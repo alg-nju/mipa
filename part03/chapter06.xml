@@ -2,7 +2,9 @@
 <chapter id="mipa.principle.pd">
   <title>Predicate Detection (PD)</title>
   
-  <para>This chapter is about the principle of PD.</para>
+  <para>This chapter is about the principle of PD.
+	<note>Under construction.</note>
+  </para>
 
   <sect1 id="mipa.principle.pd.workflow">
 	<title>Workflow of PD</title>

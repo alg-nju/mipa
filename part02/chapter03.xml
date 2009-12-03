@@ -2,18 +2,22 @@
 <chapter id="mipa.usage.user">
   <title>How to use MIPA?</title>
   
-  <para>This chapter is for users who use MIPA.</para>
-
-  <sect1 id="mipa.usage.user.application">
-	<title>Write an application</title>
-  
-	<para>This section is about how to write an application with callback interface.</para>
-  </sect1>
+  <para>This chapter is for users who use MIPA.
+	<note>
+	Under construction.
+	</note>
+  </para>
 
   <sect1 id="mipa.usage.user.predicate">
 	<title>Specify a predicate</title>
   
 	<para>This section is about how to write the predicate description with PDCC framework.</para>
+  </sect1>
+
+    <sect1 id="mipa.usage.user.application">
+	<title>Write an application</title>
+  
+	<para>This section is about how to write an application with callback interface.</para>
   </sect1>
 
   <sect1 id="mipa.usage.user.sensor">

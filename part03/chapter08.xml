@@ -2,7 +2,9 @@
 <chapter id="mipa.principle.sensor-agent">
   <title>Sensor Agent</title>
   
-  <para>This chapter is about the design of sensor agent.</para>
+  <para>This chapter is about the design of sensor agent.
+	<note>Under construction.</note>
+  </para>
 
   <sect1 id="mipa.principle.sensor-agent.plugin">
 	<title>Plug-in</title>

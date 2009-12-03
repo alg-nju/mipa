@@ -15,27 +15,27 @@ public class Connector extends Composite{
     }
 
     public void setOperator(String operator) {
-        if(operator.equals(NodeType.CONJUNCTION.toString()))
+        if(operator.equals(NodeType.CONJUNCTION.toString().toLowerCase()))
         {
             this.operator = NodeType.CONJUNCTION;
         }
-        else if(operator.equals(NodeType.DISJUNCTION.toString()))
+        else if(operator.equals(NodeType.DISJUNCTION.toString().toLowerCase()))
         {
             this.operator = NodeType.DISJUNCTION;
         }
-        else if(operator.equals(NodeType.EXISTENTIAL.toString()))
+        else if(operator.equals(NodeType.EXISTENTIAL.toString().toLowerCase()))
         {
             this.operator = NodeType.EXISTENTIAL;
         }
-        else if(operator.equals(NodeType.IMPLY.toString()))
+        else if(operator.equals(NodeType.IMPLY.toString().toLowerCase()))
         {
             this.operator = NodeType.IMPLY;
         }
-        else if(operator.equals(NodeType.NOT.toString()))
+        else if(operator.equals(NodeType.NOT.toString().toLowerCase()))
         {
             this.operator = NodeType.NOT;
         }
-        else if(operator.equals(NodeType.UNIVERSAL.toString()))
+        else if(operator.equals(NodeType.UNIVERSAL.toString().toLowerCase()))
         {
             this.operator = NodeType.UNIVERSAL;
         }
@@ -153,5 +153,15 @@ public class Connector extends Composite{
                 break;
             }
         }
+    }
+    
+    public void setFlagForUniversal(boolean flagForUniversal)
+    {
+        this.flagForUniversal = flagForUniversal;
+    }
+    
+    public boolean getFlagForUniversal()
+    {
+        return flagForUniversal;
     }
 }

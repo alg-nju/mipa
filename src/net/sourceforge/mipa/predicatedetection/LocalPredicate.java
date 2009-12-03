@@ -85,10 +85,10 @@ public class LocalPredicate implements Structure,Serializable {
         String string = "";
         for(int i=0;i<atoms.size();i++)
         {
-            string = string+atoms.get(i).getName()
+            string = string+"["+atoms.get(i).getName()
                            +" "+atoms.get(i).getOperator()
                            +" "+atoms.get(i).getValue()
-                           +" ";
+                           +"] ";
         }
         return string.trim();
     }

@@ -228,10 +228,10 @@ public class GroupManager {
             break;
         case WCP:
             allocateAsWCP(groups, 
-                    groupToChecker, 
-                    localPredicateToNormalProcess, 
-                    callback, 
-                    maxLevel);
+                          groupToChecker, 
+                          localPredicateToNormalProcess, 
+                          callback, 
+                          maxLevel);
             break;
         default:
             System.out.println("This predicate type have not been implemented yet.");

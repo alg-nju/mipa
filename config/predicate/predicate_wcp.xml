@@ -19,14 +19,14 @@
 					<formula>
 						<quantifier value="universal"/>
 						<formula>
-							<atom operator="great-than" name="temperature" value="25" />
+							<atom operator="great-than" name="temperature_1" value="25" />
 						</formula>
 					</formula>
 					<binary value="conjunction"/>
 					<formula>
 						<unary value="not"/>
 						<formula>
-							<atom operator="great-than" name="temperature" value="27" />
+							<atom operator="not-contain" name="RFID_1" value="tag_00001" />
 						</formula>
 					</formula>
 				</formula>

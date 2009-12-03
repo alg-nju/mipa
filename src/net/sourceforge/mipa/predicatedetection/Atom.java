@@ -133,6 +133,8 @@ public class Atom extends Composite {
                         nodeValue = true;
                         return;
                     }
+                nodeValue = false;
+                return;
             } else if(operator.equals("not-contain") == true) {
                 for(int i = 0; i < values.length; i++)
                     if(value.equals(values[i]) == true)
@@ -147,30 +149,51 @@ public class Atom extends Composite {
             }
             
         } else if (valueType.equals("Double") == true) {
-            // Float operators
-            double sensorValue = Double.parseDouble(values[0]);
-            double threshold = Double.parseDouble(value);
-            
-            if(operator.equals("great-than") == true) {
-                if(sensorValue > threshold)
-                {
-                    nodeValue = true;
-                    return;
+            try{
+                // Float operators
+                double sensorValue = Double.parseDouble(values[0]);
+                double threshold = Double.parseDouble(value);
+                
+                if(operator.equals("great-than") == true) {
+                    if(sensorValue > threshold)
+                    {
+                        nodeValue = true;
+                        return;
+                    }
+                    else
+                    {
+                        nodeValue = false;
+                        return;
+                    }
+                } else if(operator.equals("equals") == true) {
+                    if(sensorValue == threshold)
+                    {
+                        nodeValue = true;
+                        return;
+                    }
+                    else
+                    {
+                        nodeValue = false;
+                        return;
+                    }
+                } else if(operator.equals("less-than") == true) {
+                    if(sensorValue < threshold)
+                    {
+                        nodeValue = true;
+                        return;
+                    }
+                    else
+                    {
+                        nodeValue = false;
+                        return;
+                    }
+                } else {
+                    System.out.println("The operator of Float has not been defined.");
                 }
-            } else if(operator.equals("equals") == true) {
-                if(sensorValue == threshold)
-                {
-                    nodeValue = true;
-                    return;
-                }
-            } else if(operator.equals("less-than") == true) {
-                if(sensorValue < threshold)
-                {
-                    nodeValue = true;
-                    return;
-                }
-            } else {
-                System.out.println("The operator of Float has not been defined.");
+            }
+            catch(NumberFormatException e)
+            {
+                System.out.println("Number Format error.");
             }
         } /*else if(valueType.equals("Boolean") == true) {
             

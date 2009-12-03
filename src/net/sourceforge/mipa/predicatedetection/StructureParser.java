@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sourceforge.mipa.predicatedetection;
-
+import static config.Debug.DEBUG;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -57,7 +57,9 @@ public class StructureParser {
 
         if (elements != null) {
             result = new Composite(NodeType.GSE, "GSE");
-            System.out.println("GSE");
+            if(DEBUG){
+                System.out.println("GSE");
+            }
             for (int i = 0; i < elements.getLength(); i++) {
                 Node GSE = elements.item(i);
 
@@ -70,7 +72,9 @@ public class StructureParser {
                         if (node.getNodeName().equals("CGS")) {
                             Structure CGSNode = new Composite(NodeType.CGS,
                                                               "CGS");
-                            System.out.println("CGS");
+                            if(DEBUG){
+                                System.out.println("----CGS");
+                            }
                             result.add(CGSNode);
 
                             for (Node LP = node.getFirstChild(); 
@@ -91,10 +95,11 @@ public class StructureParser {
         return result;
     }
     
-    private LocalPredicate parseLocalPredicate(Node localPredicate) {
+    public LocalPredicate parseLocalPredicate(Node localPredicate) {
         LocalPredicate LP = new LocalPredicate();
-        System.out.println("LP");
-        
+        if(DEBUG){
+            System.out.println("--------LP");
+        }
         for (Node node = localPredicate.getFirstChild(); 
               node != null; 
               node = node.getNextSibling()) {
@@ -107,10 +112,12 @@ public class StructureParser {
         return LP;
     }
     
-    private Formula parseFormula(LocalPredicate localPredicate, Node formula)
+    public Formula parseFormula(LocalPredicate localPredicate, Node formula)
     {
         Formula formulaNode = new Formula(NodeType.FORMULA,"formula");
-        System.out.println("formula");
+        if(DEBUG){
+            System.out.println("------------formula");
+        }
         for (Node node = formula.getFirstChild(); 
             node != null; 
             node = node.getNextSibling()) {
@@ -120,7 +127,9 @@ public class StructureParser {
                     Connector quantifierNode = new Connector(NodeType.QUANTIFIER,"quantifier");
                     String operator = node.getAttributes().getNamedItem("value").getNodeValue();
                     quantifierNode.setOperator(operator);
-                    System.out.println("quantifier "+operator);
+                    if(DEBUG){
+                        System.out.println("----------------quantifier: "+operator);
+                    }
                     node = node.getNextSibling();
                     node = node.getNextSibling();
                    // if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -137,7 +146,9 @@ public class StructureParser {
                     Connector unaryNode = new Connector(NodeType.UNARY,"unary");
                     String operator = node.getAttributes().getNamedItem("value").getNodeValue();
                     unaryNode.setOperator(operator);
-                    System.out.println("unary "+operator);
+                    if(DEBUG){
+                        System.out.println("----------------unary: "+operator);
+                    }
                     node = node.getNextSibling();
                     node = node.getNextSibling();
                     Formula subFormulaNode = parseFormula(localPredicate,node);
@@ -160,7 +171,9 @@ public class StructureParser {
                     Connector binaryNode = new Connector(NodeType.BINARY,"binary");
                     String operator = node.getAttributes().getNamedItem("value").getNodeValue();
                     binaryNode.setOperator(operator);
-                    System.out.println("binary "+operator);
+                    if(DEBUG){
+                        System.out.println("----------------binary: "+operator);
+                    }
                     node = node.getNextSibling();
                     node = node.getNextSibling();
                     Formula subFormulaNode_2 = parseFormula(localPredicate,node);
@@ -176,16 +189,20 @@ public class StructureParser {
         }
         return formulaNode;
     }
-    private Structure parseAtom(Node atom)
+    public Structure parseAtom(Node atom)
     {
         Atom atomNode = new Atom(NodeType.ATOM,"atom");
-        System.out.println("atom");
+        if(DEBUG){
+            System.out.println("--------------------atom");
+        }
         String operator = atom.getAttributes().getNamedItem("operator").getNodeValue();
         String name = atom.getAttributes().getNamedItem("name").getNodeValue();
         String value = atom.getAttributes().getNamedItem("value").getNodeValue();
-        System.out.println(name);
-        System.out.println(operator);
-        System.out.println(value);
+        if(DEBUG){
+            System.out.println("------------------------"+name);
+            System.out.println("------------------------"+operator);
+            System.out.println("------------------------"+value);
+        }
         atomNode.setOperator(operator);
         atomNode.setName(name);
         atomNode.setValue(value);

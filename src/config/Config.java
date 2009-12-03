@@ -24,7 +24,7 @@ package config;
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
 public class Config {
-    public final static boolean ENABLE_PHYSICAL_CLOCK = false;
+    public final static boolean ENABLE_PHYSICAL_CLOCK = true;
     public final static boolean EXPERIMENT = true;
     public final static String LOG_DIRECTORY = "log";
     public final static String SENSORS_CONFIG_DIRECTORY = "config/sensors/";

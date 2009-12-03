@@ -138,6 +138,9 @@ public class StructureParser {
                             Formula subFormulaNode = parseFormula(localPredicate,node);
                             formulaNode.setConnetor(quantifierNode);
                             formulaNode.add(subFormulaNode);
+                            //quantifierNode.setFather(formulaNode);
+                            //subFormulaNode.setFather(formulaNode);
+                            
                    //     }
                    // }
                 }
@@ -154,13 +157,16 @@ public class StructureParser {
                     Formula subFormulaNode = parseFormula(localPredicate,node);
                     formulaNode.setConnetor(unaryNode);
                     formulaNode.add(subFormulaNode);
+                    //unaryNode.setFather(formulaNode);
+                    //subFormulaNode.setFather(formulaNode);
                 }
                 else if(node.getNodeName().equals("atom"))
                 {
-                    Structure atom = parseAtom(node);
+                    Atom atom = (Atom)parseAtom(node);
                     formulaNode.add(atom);
+                    //atom.setFather(formulaNode);
                     //将所有的Atom保存到LocalPredicate的ArrayList<Atom>中
-                    localPredicate.addAtom((Atom)atom);
+                    localPredicate.addAtom(atom);
                     
                 }
                 else if(node.getNodeName().equals("formula"))
@@ -180,6 +186,9 @@ public class StructureParser {
                     formulaNode.setConnetor(binaryNode);
                     formulaNode.add(subFormulaNode_1);
                     formulaNode.add(subFormulaNode_2);
+                    //binaryNode.setFather(formulaNode);
+                    //subFormulaNode_1.setFather(formulaNode);
+                    //subFormulaNode_2.setFather(formulaNode);
                 }
                 else
                 {

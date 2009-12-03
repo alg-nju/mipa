@@ -138,7 +138,7 @@ public abstract class Condition implements Serializable {
      *            event values
      * @return local predicate result
      */
-    protected void assign(String eventName, String[] values) {
+    public void assign(String eventName, String[] values) {
         ArrayList<Atom> arrayList = map.get(eventName);
         for(int i = 0; i < arrayList.size(); i++)
         {
@@ -165,5 +165,18 @@ public abstract class Condition implements Serializable {
                 //设标志位，做第一次全遍历?
             }
         }
+    }
+    
+    public HashMap<String, ArrayList<Atom>> getMap()
+    {
+        return map;
+    }
+    public Composite getLocalPredicate()
+    {
+        return localPredicate;
+    }
+    public void setLocalPredicate(Composite localPredicate)
+    {
+        this.localPredicate = localPredicate;
     }
 }

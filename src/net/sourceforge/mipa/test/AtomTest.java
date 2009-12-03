@@ -90,13 +90,20 @@ public class AtomTest {
         
     }
     
-    @Test(expected = NumberFormatException.class)
+    @Test
     public void testUpdateException() {
-        values[0]="a";
-        atom.setValueType("Double");
-        atom.setName("temperature");
-        atom.setOperator("greater-than");
-        atom.setValue("20");
-        atom.update(values);
+        try
+        {
+            values[0]="a";
+            atom.setValueType("Double");
+            atom.setName("temperature");
+            atom.setOperator("greater-than");
+            atom.setValue("20");
+            atom.update(values);
+        }
+        catch(NumberFormatException e)
+        {
+            fail("Cannot be here!");
+        }
     }
 }

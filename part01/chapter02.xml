@@ -19,7 +19,7 @@
 	  </para></listitem>
 	<listitem><para>Configure the sensor agents for sensors</para></listitem>
 	<listitem><para>Configure system</para></listitem>
-	<listitem><para>Starting system</para></listitem>
+	<listitem><para>Launch system</para></listitem>
   </orderedlist>
   
   <sect1 id="mipa.a-simple-example.predicate">
@@ -55,19 +55,19 @@
 	<para>
 	  In this example, the user is interested in the events of light and RFID. If
 	  <code>light &gt; 500</code> and <code>RFID not-contain tag_00001</code>
-	occur simultaneously, the user should be notified. (??? do NOT use 'user' and 'application' exchangably.)
+	occur simultaneously, the application should be notified.
 	</para>
   </sect1>
 
   
   <sect1 id="mipa.a-simple-example.application">
-	<title>Implementing Callback Interface (???)</title>
+	<title>Implementing the Callback Interface (???)</title>
   
 	<para>The application of the MIPA should implement the callback interface 
 	which the MIPA call for notifying it.</para>
 	
 	<para>In this example, when the predicate is true, the application just
-	  prints "Hello World!". The callback code is shown as below.
+	  prints "Hello World!". The callback code is shown below.
 	</para>
   
 	<programlisting>
@@ -90,7 +90,7 @@ public class Application extends AbstractApplication {
 	existing contexts satisfy the predicate, you just skip this step. (???)
 	</para>
 	
-	<para>MIPA supports sensors through the plug-in mode. (??? MIPA integrates sensors as plug-ins.) If there is no existing
+	<para>MIPA integrates sensors as plug-ins. If there is no existing
 	context that the predicate uses. All you should do is writing the sensors
 	which the context relates to. In order to archive this target, you should
 	write sensors classes and configure them. (??? two different things mixed up)
@@ -209,12 +209,14 @@ public class SimulationRFID implements Sensor {
 	<title>Configuring System</title>
   
 	<para>Before we run the MIPA, the system should be configured. An example of
-	a system configuration file is shown below. In this edition, we just
-	configure the IP and port of a naming service, usually it is the same as (???)
-	  <link linkend="mipa.principle.pd">Predicate Detection Side</link>.
+	a system configuration file is shown below. In this edition, we should
+	configure the IP and port of a naming service, usually it is located in the
+	  same address as the <link linkend="mipa.principle.pd">Predicate Detection
+	  Side</link>.
 	</para>
 	
-	<para>In this example, we choose <code>normal</code> mode of <code>check mode</code>.(??? need to explain the mode?)
+	<para>In this example, we choose <code>normal</code> mode of <code>check
+	  mode</code>. The mode will be explained in <link linkend="">XXX</link> Section.
 	</para>
   
 	<programlisting>
@@ -232,18 +234,20 @@ public class SimulationRFID implements Sensor {
   </sect1>
 
   <sect1 id="mipa.a-simple-example.start-system">
-	<title>Starting System (??? launching? initiating?)</title>
+	<title>Launching System</title>
   
-	<para>OK (???), let's start the system.</para>
+	<para>Now, let's launch the system.</para>
   
-	<para>MIPA consists of two sides: (PD-side and ECA-side) <code>Predicate Detection Side</code> and
-	  <code>ECA Side</code>. At any time, there are one instance of the predicate
-	detection side and many instances of the ECA sides (???). All of them are running
-	in (???) distributed environment.
+	<para>MIPA consists of two sides: (PD-side and ECA-side) <code>Predicate
+	  Detection Side</code> and <code>ECA Side</code>. At any time, there are
+	  one instance of the <code>Predicate Detection Side</code> and many instances of
+	  the <code>ECA Side</code> (???). They are running in (???) distributed
+	environment.
 	</para>
   
-	<para>Start scripts are located in <code>${MIPA Home}/bin</code>, it supports
-	both Linux and Windows operating systems. Let me (???)take Linux as example.
+	<para>Launch scripts are located in <code>${MIPA Home}/bin</code>, it supports
+	both Linux and Windows operating systems. In this manual, we take Linux for
+	example.
 	</para>
   
 	<para>The steps of starting <code>Predicate Detection Side</code>: (Please
@@ -254,13 +258,13 @@ public class SimulationRFID implements Sensor {
 	  <listitem><para><code>$./MIPAInitialize</code></para></listitem>
 	</orderedlist>
   
-	<para>The naming service is also starting with(???) <code>Predicate Detection Side</code></para>
+	<para>The naming service is also launching at <code>Predicate Detection Side</code></para>
   
-	<para>You can start <code>ECA Side</code> in the same computer of <code>Predicate
-	  Detection Side</code> or in a new computer as you like.
+	<para>You can launch the <code>ECA Side</code> in the same computer of the
+	  <code>Predicate Detection Side</code> or in a new computer as you like.
 	</para>
   
-	<para>The steps of starting an <code>ECA Side</code>:</para>
+	<para>The steps of launching an <code>ECA Side</code>:</para>
   
 	<orderedlist>
 	  <listitem><para><code>$cd ${MIPA Home}/bin/linux</code></para></listitem>
@@ -271,7 +275,7 @@ public class SimulationRFID implements Sensor {
 	whose start script is located in the same directory as others.
 	</para>
   
-	<para>The steps of starting the example:</para>
+	<para>The steps of launching the example:</para>
   
 	<orderedlist>
 	  <listitem><para><code>$cd ${MIPA Home}/bin/linux</code></para></listitem>

@@ -2,35 +2,32 @@
 <chapter id="mipa.a-simple-example">
   <title>Getting Started</title>
 
-  <para>In this chapter, we will develop a simple case on the MIPA middleware. Just
-  echoes 'Hello World!' when the specific predicate is concerned.
+  <para>In this chapter, we will show how to use the MIPA middleware infrastructuer via a 'Hello World!' example.
   </para>
   
   <important>
-	<para>All programs in the MIPA are written in Java.</para>
+	<para>MIPA is developed purely in Java.</para>
 	<para>All configuration files are written in XML.</para>
   </important>
   
-  <para>There are four steps that a user should follow for building a runnable
-  application.
+  <para> To achieve context-awareness based on MIPA, the application simplely needs to take 5 steps:  
   </para>
-
+  <para> ??? the application simply needs to specify and send the predicate, and wait for the respose. (it may also need to ensure the specified context is supported. ) then, MIPA needs to do xxx steps. </para>
   <orderedlist>
-	<listitem><para>Specifying a predicate</para></listitem>
-	<listitem><para>Implementing the callback interface for an application
+	<listitem><para>Specify the context property it is concerned with </para></listitem>
+	<listitem><para>Implement the callback interface
 	  </para></listitem>
-	<listitem><para>Writing agents for sensors</para></listitem>
-	<listitem><para>Configuring system</para></listitem>
+	<listitem><para>Configure the sensor agents for sensors</para></listitem>
+	<listitem><para>Configure system</para></listitem>
 	<listitem><para>Starting system</para></listitem>
   </orderedlist>
   
   <sect1 id="mipa.a-simple-example.predicate">
 	<title>Specifying a Predicate</title>
   
-	<para>We provide <link linkend="mipa.principle.predicate.definition">PDCC
-	  framework</link> for users to specify their predicates.
-	The predicates describe the events of the users concerned. Here is an
-	example of predicate definition.
+	<para>We provide the <link linkend="mipa.principle.predicate.definition">PDCC
+	  framework</link> for users to specify their RECA. (??? Based on PDCC, application delineates its RECA using predicates.)Here is an
+	example of a predicate delineating an application's RECA.
 	</para>
   
 	<programlisting>
@@ -56,15 +53,15 @@
 &lt;/predicate&gt;
 </programlisting>
 	<para>
-	  In this example, the user interests the events of light and RFID. If
+	  In this example, the user is interested in the events of light and RFID. If
 	  <code>light &gt; 500</code> and <code>RFID not-contain tag_00001</code>
-	occur simultaneously, the user should be notified.
+	occur simultaneously, the user should be notified. (??? do NOT use 'user' and 'application' exchangably.)
 	</para>
   </sect1>
 
   
   <sect1 id="mipa.a-simple-example.application">
-	<title>Implementing Callback Interface</title>
+	<title>Implementing Callback Interface (???)</title>
   
 	<para>The application of the MIPA should implement the callback interface 
 	which the MIPA call for notifying it.</para>
@@ -87,16 +84,16 @@ public class Application extends AbstractApplication {
   </sect1>
 
   <sect1 id="mipa.a-simple-example.sensor">
-	<title>Writing Agents for Sensors</title>
+	<title>Writing Agents for Sensors (??? configuring sensor agents)</title>
 	
 	<para>This step is optional. It dues to the existing sensors. If the
-	existing contexts satisfy the predicate, you just skip this section.
+	existing contexts satisfy the predicate, you just skip this step. (???)
 	</para>
 	
-	<para>MIPA supports sensors through the plug-in mode. If there is no existing
+	<para>MIPA supports sensors through the plug-in mode. (??? MIPA integrates sensors as plug-ins.) If there is no existing
 	context that the predicate uses. All you should do is writing the sensors
 	which the context relates to. In order to archive this target, you should
-	write sensors classes and configure them.
+	write sensors classes and configure them. (??? two different things mixed up)
 	</para>
   
 	<para>Here is a simulated RFID sensor class. All sensors in the MIPA
@@ -212,12 +209,12 @@ public class SimulationRFID implements Sensor {
 	<title>Configuring System</title>
   
 	<para>Before we run the MIPA, the system should be configured. An example of
-	a system configuration file is shown as below. In this edition, we just
-	configure the IP and port of a naming service, usually it is the same as
+	a system configuration file is shown below. In this edition, we just
+	configure the IP and port of a naming service, usually it is the same as (???)
 	  <link linkend="mipa.principle.pd">Predicate Detection Side</link>.
 	</para>
 	
-	<para>In this example, we choose <code>normal</code> mode of <code>check mode</code>.
+	<para>In this example, we choose <code>normal</code> mode of <code>check mode</code>.(??? need to explain the mode?)
 	</para>
   
 	<programlisting>
@@ -235,18 +232,18 @@ public class SimulationRFID implements Sensor {
   </sect1>
 
   <sect1 id="mipa.a-simple-example.start-system">
-	<title>Starting System</title>
+	<title>Starting System (??? launching? initiating?)</title>
   
-	<para>OK, let's start the system.</para>
+	<para>OK (???), let's start the system.</para>
   
-	<para>MIPA consists of two sides: <code>Predicate Detection Side</code> and
+	<para>MIPA consists of two sides: (PD-side and ECA-side) <code>Predicate Detection Side</code> and
 	  <code>ECA Side</code>. At any time, there are one instance of the predicate
-	detection side and many instances of the ECA sides. All of them are running
-	in distributed environment.
+	detection side and many instances of the ECA sides (???). All of them are running
+	in (???) distributed environment.
 	</para>
   
 	<para>Start scripts are located in <code>${MIPA Home}/bin</code>, it supports
-	both Linux and Windows operating systems. Let me take Linux as example.
+	both Linux and Windows operating systems. Let me (???)take Linux as example.
 	</para>
   
 	<para>The steps of starting <code>Predicate Detection Side</code>: (Please
@@ -257,7 +254,7 @@ public class SimulationRFID implements Sensor {
 	  <listitem><para><code>$./MIPAInitialize</code></para></listitem>
 	</orderedlist>
   
-	<para>The naming service is also starting with <code>Predicate Detection Side</code></para>
+	<para>The naming service is also starting with(???) <code>Predicate Detection Side</code></para>
   
 	<para>You can start <code>ECA Side</code> in the same computer of <code>Predicate
 	  Detection Side</code> or in a new computer as you like.

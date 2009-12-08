@@ -44,12 +44,18 @@ public class ConnectorTest {
 
     @Test
     public void testSetOperator() {
-        assertEquals(NodeType.CONJUNCTION, "conjunction");
-        assertEquals(NodeType.DISJUNCTION, "disjunction");
-        assertEquals(NodeType.EXISTENTIAL, "existential");
-        assertEquals(NodeType.IMPLY, "imply");
-        assertEquals(NodeType.NOT, "not");
-        assertEquals(NodeType.UNIVERSAL, "binary");
+        connector.setOperator("conjunction");
+        assertEquals(NodeType.CONJUNCTION, connector.getOperator());
+        connector.setOperator("disjunction");
+        assertEquals(NodeType.DISJUNCTION, connector.getOperator());
+        connector.setOperator("existential");
+        assertEquals(NodeType.EXISTENTIAL, connector.getOperator());
+        connector.setOperator("imply");
+        assertEquals(NodeType.IMPLY, connector.getOperator());
+        connector.setOperator("not");
+        assertEquals(NodeType.NOT, connector.getOperator());
+        connector.setOperator("universal");
+        assertEquals(NodeType.UNIVERSAL, connector.getOperator());
     }
 
     @Test
@@ -153,52 +159,21 @@ public class ConnectorTest {
         //-----------------------------
         connector.setOperator("universal");
         
-        connector.setFlagForUniversal(false);
         lastValue = connector.getNodeValue();
         composite_1.setNodeValue(false);
         connector.update();
         assertEquals(false,connector.getNodeValue());
         assertEquals(lastValue, connector.getLastValue());
-        assertEquals(true,connector.getFlagForUniversal());
         
-        connector.setFlagForUniversal(false);
         lastValue = connector.getNodeValue();
         composite_1.setNodeValue(true);
         connector.update();
         assertEquals(true,connector.getNodeValue());
         assertEquals(lastValue, connector.getLastValue());
-        assertEquals(true,connector.getFlagForUniversal());
-        
-        connector.setFlagForUniversal(true);
-        lastValue = connector.getNodeValue();
-        composite_1.setNodeValue(false);
-        connector.update();
-        assertEquals(false,connector.getNodeValue());
-        assertEquals(lastValue, connector.getLastValue());
-        assertEquals(true,connector.getFlagForUniversal());
-        
-        connector.setFlagForUniversal(true);
-        connector.setNodeValue(false);
-        lastValue = connector.getNodeValue();
-        composite_1.setNodeValue(true);
-        connector.update();
-        assertEquals(false,connector.getNodeValue());
-        assertEquals(lastValue, connector.getLastValue());
-        assertEquals(true,connector.getFlagForUniversal());
-        
-        connector.setFlagForUniversal(true);
-        connector.setNodeValue(true);
-        lastValue = connector.getNodeValue();
-        composite_1.setNodeValue(true);
-        connector.update();
-        assertEquals(true,connector.getNodeValue());
-        assertEquals(lastValue, connector.getLastValue());
-        assertEquals(true,connector.getFlagForUniversal());
-        
+
         //-------------------------------------
         connector.setOperator("existential");
 
-        connector.setNodeValue(false);
         lastValue = connector.getNodeValue();
         composite_1.setNodeValue(false);
         connector.update();
@@ -221,13 +196,11 @@ public class ConnectorTest {
         connector.update();
         assertEquals(true,connector.getNodeValue());
         assertEquals(lastValue, connector.getLastValue());
-        assertEquals(true,connector.getFlagForUniversal());
         
         lastValue = connector.getNodeValue();
         composite_1.setNodeValue(true);
         connector.update();
         assertEquals(false,connector.getNodeValue());
         assertEquals(lastValue, connector.getLastValue());
-        assertEquals(true,connector.getFlagForUniversal());
     }
 }

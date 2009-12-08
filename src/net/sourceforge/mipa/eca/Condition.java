@@ -162,7 +162,7 @@ public abstract class Condition implements Serializable {
             }
             else
             {
-                //设标志位，做第一次全遍历?
+              //do nothing
             }
         }
     }

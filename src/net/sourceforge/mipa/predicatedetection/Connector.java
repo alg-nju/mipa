@@ -63,23 +63,12 @@ public class Connector extends Composite{
                 {
                     case UNIVERSAL:
                     {
-                        if(flagForUniversal == false)
-                        {
-                            nodeValue = true;
-                            flagForUniversal = true;
-                        }
-                        if(value == false)
-                        {
-                            nodeValue = false;
-                        }
+                        nodeValue = value;
                         break;
                     }
                     case EXISTENTIAL:
                     {
-                        if(value == true)
-                        {
-                            nodeValue = true;
-                        }
+                        nodeValue = value;
                         break;
                     }
                     default:

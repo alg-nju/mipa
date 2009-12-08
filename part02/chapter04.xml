@@ -19,4 +19,10 @@
 	<para>This section describes interfaces which the checker prcoess can
 	access. Steps of creating a new checker process will be presented here.</para>
   </sect1>
+
+  <sect1 id="mipa.usage.developer.checkMode">
+	<title>Check Mode</title>
+  
+	<para>check mode.</para>
+  </sect1>
 </chapter>

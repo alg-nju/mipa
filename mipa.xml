@@ -59,13 +59,13 @@
   </part>
 
   <part id="mipa.part02">
-	<title>Usage</title>
+	<title>Using and Extending MIPA</title>
   &ch03;
   &ch04;
   </part>
 
   <part id="mipa.part03">
-	<title>Principle</title>
+	<title>Design Rationales behind MIPA</title>
   &ch05;
   &ch06;
   &ch07;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="mipa.usage.developer">
-  <title>Develop new predicate detection algorithm</title>
+  <title>Developing a new predicate detection algorithm</title>
   
   <para>This chapter is for developers who use MIPA.
 	<note>Under construction.</note>

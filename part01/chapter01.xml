@@ -20,10 +20,13 @@
       <para>MIPA is an open-source middleware currently hosted on Googlecode at http://mipa.googlecode.com/.</para>
       <para>Please refer to our techical papers
 	<footnote>
-	  <para>paper 1</para>
+	  <para> Yu Huang, Xiaoxing Ma, Jiannong Cao, Xianping Tao and Jian Lu, Concurrent Event Detection for Asynchronous Consistency Checking of Pervasive Context, in proc. of the 7th Annual IEEE Intl. Conf. on Pervasive Computing and Communications (PerCom), 2009. </para>
 	</footnote>
 	<footnote>
-	  <para>paper 2</para>
+	  <para> Yu Huang, Jianping Yu, Jiannong Cao, Xiaoxing Ma, Xianping Tao, Jian Lu, Checking Behavioral Consistency Constraints for Pervasive Context in Asynchronous Environments, Technical report TR090709-MOPEC-ICS-NJU, Institute of Computer Software, Nanjing University, Sep. 2009. </para>
+	</footnote>
+	<footnote>
+	<para> Jianping Yu, Yu Huang, Jiannong Cao, Xiaoxing Ma, Xianping Tao, Jian Lu, Middleware Infrastructure for Predicate Detection-based Consistency Checking of Pervasive Context, Technical report TR101409-MOPEC-ICS-NJU, Institute of Computer Software, Nanjing University, Nov. 2009. </para>
 	</footnote>
 	, to find further disucssions on the research issues in designing, implementing and using MIPA. </para>
     </note>

@@ -33,7 +33,7 @@ import net.sourceforge.mipa.predicatedetection.AbstractFIFOChecker;
 /**
  * 
  * @author tingting Hua<huatingting0820@gmail.com>
- *
+ * 
  */
 public abstract class LatticeChecker extends AbstractFIFOChecker {
 
@@ -41,23 +41,23 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 
 	private int dimension;
 
-	/**store the current globalState*/
+	/** store the current globalState */
 	private LocalState[] globalState;
 
-	/**store all the received state*/
+	/** store all the received state */
 	private ArrayList<ArrayList<LocalState>> stateSet;
 
 	private ArrayList<ArrayList<LocalState>> buffer;
 
-	/**lattice start node*/
+	/** lattice start node */
 	private AbstractLatticeNode startNode;
 
 	private AbstractLatticeNode currentNode;
 
 	private ArrayList<LocalState> max;
 
-	/**output the lattice constructor procedure information*/
-	private PrintWriter out=null;
+	/** output the lattice constructor procedure information */
+	private PrintWriter out = null;
 
 	public LatticeChecker(ResultCallback application, String checkerName,
 			String[] normalProcesses) {
@@ -80,141 +80,166 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 			stateSet.add(new ArrayList<LocalState>());
 			stateSet.get(i).add(globalState[i]);
 			buffer.add(new ArrayList<LocalState>());
-			buffer.get(i).add(globalState[i]);
+			// buffer.get(i).add(globalState[i]);
 			max.add(globalState[i]);
 			s[i] = "0";
 		}
 
-		startNode = createNode(globalState,s);
+		startNode = createNode(globalState, s);
 		currentNode = startNode;
-	
+
 		try {
-            out = new PrintWriter(LOG_DIRECTORY + "/checker.log");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+			out = new PrintWriter(LOG_DIRECTORY + "/checker.log");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
 	protected void handle(ArrayList<Message> messages) {
-	    
-	    String normalProcess = messages.get(0).getSenderID();
-        int id = nameToID.get(normalProcess).intValue();
-        
-	    for (int i = 0; i < messages.size(); i++) {
-            Message mess = messages.get(i);
-            LatticeMessageContent content = (LatticeMessageContent) mess
-                    .getMessageContent();
-            LocalState localstate = new LocalState(id,
-                    content.getlvc(), content.getlocalPredicate());
-            //output the lattice constructor procedure information
-            try {
-                out.println(mess.getMessageID()+", "+normalProcess+", "+content.getlocalPredicate()+", "+content.getlvc().toString());
-                out.flush();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-             
-            boolean b = buffer(localstate);
-            
-            //output the lattice constructor procedure information
-            try {
-                out.println("whether generate lattice : "+b);
-                out.flush();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-            
-            if (b) {
-                check(startNode,currentNode);
-            }
-        }
+
+		String normalProcess = messages.get(0).getSenderID();
+		int id = nameToID.get(normalProcess).intValue();
+
+		for (int i = 0; i < messages.size(); i++) {
+			Message mess = messages.get(i);
+			LatticeMessageContent content = (LatticeMessageContent) mess
+					.getMessageContent();
+			LocalState localstate = new LocalState(id, content.getlvc(),
+					content.getlocalPredicate());
+			// output the lattice constructor procedure information
+			try {
+				out.println(mess.getMessageID() + ", " + normalProcess + ", "
+						+ content.getlocalPredicate() + ", "
+						+ content.getlvc().toString());
+				out.flush();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			boolean b = buffer(localstate);
+
+			// output the lattice constructor procedure information
+			try {
+				out.println("whether generate lattice : " + b);
+				out.flush();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			if (b) {
+				check(startNode, currentNode);
+			}
+		}
 	}
+
+	private void bufferrecursion(int pID) {
+		boolean b = false;
+		for (int i = 0; i < dimension; i++) {
+			if ((i != pID)) {
+				while ((buffer.get(i).size() > 0)) {
+					boolean bo = true;
+					for (int j = 0; j < dimension; j++) {
+						if ((j != i)
+								&& (globalState[j].vc.lessThan(buffer.get(i)
+										.get(0).vc))) {
+							bo = false;
+						}
+					}
+					if (bo) {
+						// output the lattice constructor procedure information
+						try {
+							out
+									.println("to call expandLattice(state), state's vector clcok is"
+											+ buffer.get(i).get(0).vc
+													.toString());
+							out.flush();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						expandLattice(buffer.get(i).get(0));
+						buffer.get(i).remove(0);
+						b = true;
+					} else {
+						break;
+					}
+				}
+				if (b) {
+					bufferrecursion(i);
+					break;
+				}
+			}
+		}
+	}
+
 	/**
 	 * check whether the state is happen-before ordered.
+	 * 
 	 * @param state
 	 * @return
 	 */
 	private boolean buffer(LocalState state) {
 		boolean result = false;
 		int pID = state.processID;
-		if (buffer.get(pID).size() == 1) {
+		if (buffer.get(pID).size() == 0) {
 			boolean b = true;
 			for (int i = 0; i < dimension; i++) {
-				if ((i != pID) && (buffer.get(i).get(0).vc.lessThan(state.vc))) {
+				if ((i != pID) && (globalState[i].vc.lessThan(state.vc))) {
 					b = false;
 				}
 			}
 			if (b) {
-				buffer.get(pID).remove(0);
-				buffer.get(pID).add(state);
+				// buffer.get(pID).remove(0);
+				// buffer.get(pID).add(state);
 
-				//output the lattice constructor procedure information
+				// output the lattice constructor procedure information
 				try {
-                    out.println("to call expandLattice(state), state's vector clcok is"+state.vc.toString());
-                    out.flush();
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-				
+					out
+							.println("to call expandLattice(state), state's vector clcok is"
+									+ state.vc.toString());
+					out.flush();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 				expandLattice(state);
 				result = true;
 
-				for (int i = 0; i < dimension; i++) {
-					if ((i != pID)) {
-						while ((buffer.get(i).size() > 1)) {
-							boolean bo = true;
-							for (int j = 0; j < dimension; j++) {
-								if ((j != i)
-										&& (buffer.get(j).get(0).vc
-												.lessThan(buffer.get(i).get(1).vc))) {
-									bo = false;
-								}
-							}
-							if (bo) {
-								buffer.get(i).remove(0);
-	
-								//output the lattice constructor procedure information
-								try {
-				                    out.println("to call expandLattice(state), state's vector clcok is"+state.vc.toString());
-				                    out.flush();
-				                } catch(Exception e) {
-				                    e.printStackTrace();
-				                }
-								expandLattice(buffer.get(i).get(0));
-							} else {
-								break;
-							}
-						}
-					}
-				}
+				// recursive check the other processes whether have new state to
+				// extend
+				bufferrecursion(pID);
+
 			} else {
 				buffer.get(pID).add(state);
 
-				//output the lattice constructor procedure information
+				// output the lattice constructor procedure information
 				try {
-                    out.println("store in buffer, state's vector clcok is"+state.vc.toString());
-                    out.flush();
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
+					out.println("store in buffer, state's vector clcok is"
+							+ state.vc.toString());
+					out.flush();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		} else {
 
-			//output the lattice constructor procedure information
+			// output the lattice constructor procedure information
 			try {
-                out.println("store in buffer, state's vector clcok is"+state.vc.toString());
-                out.flush();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
+				out.println("store in buffer, state's vector clcok is"
+						+ state.vc.toString());
+				out.flush();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			buffer.get(pID).add(state);
 		}
 		return result;
 	}
 
 	/**
-	 * compute the set of state, which is pre-concurrent with state s and is maximum of each process
+	 * compute the set of state, which is pre-concurrent with state s and is
+	 * maximum of each process
+	 * 
 	 * @param s
 	 */
 	private void updateMax(LocalState s) {
@@ -242,7 +267,9 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 	}
 
 	/**
-	 * compare two nodes, if equal, return 0; if node1 linked before node2, return 1; others, return -1.
+	 * compare two nodes, if equal, return 0; if node1 linked before node2,
+	 * return 1; others, return -1.
+	 * 
 	 * @param node1
 	 * @param node2
 	 * @return
@@ -283,6 +310,7 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 
 	/**
 	 * generate the lattice by adding the new state.
+	 * 
 	 * @param state
 	 */
 	private void expandLattice(LocalState state) {
@@ -294,24 +322,24 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 		for (int j = 0; j < dimension; j++) {
 			int temp = stateSet.get(j).size()
 					- stateSet.get(j).indexOf(globalState[j]) - 1;
-			str[j]=String.valueOf(temp);
+			str[j] = String.valueOf(temp);
 		}
-		AbstractLatticeNode node = createNode(globalState,str);
+		AbstractLatticeNode node = createNode(globalState, str);
 		currentNode.next.add(node);
 		node.previous.add(currentNode);
 		currentNode = node;
-		
-		//output the lattice constructor procedure information
+
+		// output the lattice constructor procedure information
 		try {
-            out.print("created new node: ");
-            for(int m=0;m<dimension;m++){
-            	String end = m + 1 != dimension ? " " : "\r\n";
-            	out.print(node.getID()[m]+end);
-            }
-            out.flush();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+			out.print("created new node: ");
+			for (int m = 0; m < dimension; m++) {
+				String end = m + 1 != dimension ? " " : "\r\n";
+				out.print(node.getID()[m] + end);
+			}
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		updateMax(state);
 		if (max.size() > 0) { // generate Lattice
@@ -352,9 +380,10 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 									int temp = stateSet.get(j).size()
 											- stateSet.get(j).indexOf(
 													globalState[j]) - 1;
-									str[j]=String.valueOf(temp);
+									str[j] = String.valueOf(temp);
 								}
-								AbstractLatticeNode newnode = createNode(globalState,str);
+								AbstractLatticeNode newnode = createNode(
+										globalState, str);
 								// check whether the node has been created.
 								ArrayList<AbstractLatticeNode> nodelist = currentNode.previous;
 								Iterator<AbstractLatticeNode> nodeiter = nodelist
@@ -370,20 +399,22 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 									listStack.push(new ArrayList<LocalState>());
 									break;
 								}
-								
-								//output the lattice constructor procedure information
+
+								// output the lattice constructor procedure
+								// information
 								try {
-						            out.print("inside created new node: ");
-						            for(int m=0;m<dimension;m++){
-						            	String end = m + 1 != dimension ? " " : "\r\n";
-						            	out.print(newnode.getID()[m]+end);
-						            }
-						            out.flush();
-						        } catch(Exception e) {
-						            e.printStackTrace();
-						        }
-						        
-						        // if not created, add into the lattice.
+									out.print("inside created new node: ");
+									for (int m = 0; m < dimension; m++) {
+										String end = m + 1 != dimension ? " "
+												: "\r\n";
+										out.print(newnode.getID()[m] + end);
+									}
+									out.flush();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+
+								// if not created, add into the lattice.
 								currentNode.previous.add(newnode);
 								newnode.next.add(currentNode);
 								for (int j = 0; j < currentNode.previous.size() - 1; j++) {
@@ -442,8 +473,10 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 
 	}
 
-	public abstract AbstractLatticeNode createNode(LocalState[] globalState,String[] s);
+	public abstract AbstractLatticeNode createNode(LocalState[] globalState,
+			String[] s);
 
-	public abstract void check(AbstractLatticeNode startNode, AbstractLatticeNode currentNode);
+	public abstract void check(AbstractLatticeNode startNode,
+			AbstractLatticeNode currentNode);
 
 }

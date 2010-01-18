@@ -20,26 +20,33 @@
 package net.sourceforge.mipa.predicatedetection.lattice;
 
 import java.util.ArrayList;
+
+import net.sourceforge.mipa.predicatedetection.lattice.SCP.SCPLatticeNode;
+import net.sourceforge.mipa.predicatedetection.lattice.simplesequence.SSLatticeNode;
 import net.sourceforge.mipa.predicatedetection.lattice.wcp.WCPLatticeNode;
 
 /**
  * 
  * @author tingting Hua<huatingting0820@gmail.com>
- *
+ * 
  */
 public abstract class AbstractLatticeNode {
 
-	//label the node, not necessary.
-	protected String[] ID;         
+	// label the node, not necessary.
+	protected String[] ID;
 
 	protected LocalState[] globalState;
 
 	protected ArrayList<AbstractLatticeNode> next;
 
 	protected ArrayList<AbstractLatticeNode> previous;
-	
-	//link to children type node
-	protected WCPLatticeNode WCPNode=null;
+
+	// link to children type node
+	protected WCPLatticeNode WCPNode = null;
+
+	protected SCPLatticeNode SCPNode = null;
+
+	protected SSLatticeNode SSNode = null;
 
 	public AbstractLatticeNode(LocalState[] gs, String[] s) {
 		ID = s;
@@ -50,29 +57,45 @@ public abstract class AbstractLatticeNode {
 		next = new ArrayList<AbstractLatticeNode>();
 		previous = new ArrayList<AbstractLatticeNode>();
 	}
-	
-	public String[] getID(){
+
+	public String[] getID() {
 		return ID;
 	}
-	
-	public LocalState[] getglobalState(){
+
+	public LocalState[] getglobalState() {
 		return globalState;
 	}
-	
-	public ArrayList<AbstractLatticeNode> getnext(){
+
+	public ArrayList<AbstractLatticeNode> getnext() {
 		return next;
 	}
-	
-	public ArrayList<AbstractLatticeNode> getprevious(){
+
+	public ArrayList<AbstractLatticeNode> getprevious() {
 		return previous;
 	}
-	
-	public void setWCPNode(WCPLatticeNode WCPNode){
-		this.WCPNode=WCPNode;
+
+	public void setWCPNode(WCPLatticeNode WCPNode) {
+		this.WCPNode = WCPNode;
 	}
-	
-	public WCPLatticeNode getWCPNode(){
+
+	public WCPLatticeNode getWCPNode() {
 		return WCPNode;
+	}
+
+	public void setSSNode(SSLatticeNode SSNode) {
+		this.SSNode = SSNode;
+	}
+
+	public SSLatticeNode getSSNode() {
+		return SSNode;
+	}
+
+	public void setSCPNode(SCPLatticeNode SCPNode) {
+		this.SCPNode = SCPNode;
+	}
+
+	public SCPLatticeNode getSCPNode() {
+		return SCPNode;
 	}
 
 }

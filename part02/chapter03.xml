@@ -12,6 +12,15 @@
 	<title>Specify a predicate</title>
   
 	<para>This section is about how to write the predicate description with PDCC framework.</para>
+	<para>
+	  <!-- An example for inserting an image into the DocBook. -->
+	    <mediaobject>
+	      <imageobject>
+		<imagedata fileref="images/part02/warning.png" align="center" />
+	      </imageobject>
+	      <caption><para>This is an image in DocBook.</para></caption>
+	    </mediaobject>
+	</para>
   </sect1>
 
     <sect1 id="mipa.usage.user.application">

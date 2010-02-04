@@ -28,6 +28,7 @@ import net.sourceforge.mipa.components.CheckMode;
 import net.sourceforge.mipa.components.Communication;
 import net.sourceforge.mipa.components.MIPAResource;
 import net.sourceforge.mipa.naming.Naming;
+import net.sourceforge.mipa.predicatedetection.lattice.SCP.SCPLatticeChecker;
 import net.sourceforge.mipa.predicatedetection.lattice.wcp.WCPLatticeChecker;
 import net.sourceforge.mipa.predicatedetection.oga.OGASubChecker;
 import net.sourceforge.mipa.predicatedetection.oga.OGATopChecker;
@@ -109,7 +110,16 @@ public class CheckerFactory {
                     System.out.println("binding checker " + checkerName);
                 }
             } else if(checkMode == CheckMode.LATTICE) {
-                
+            	SCPLatticeChecker checker = new SCPLatticeChecker(application, checkerName,
+				                        normalProcesses);
+				Communication checkerStub 
+				        = (Communication) UnicastRemoteObject
+				                                .exportObject(checker,
+				                                              0);
+				server.bind(checkerName, checkerStub);
+				if (DEBUG) {
+				System.out.println("binding checker " + checkerName);
+				}
                 
             } else {
                 System.out.println("Check Mode " + checkMode + "has not been defined.");

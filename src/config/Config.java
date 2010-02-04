@@ -25,7 +25,7 @@ package config;
  */
 public class Config {
     /** output physical clock for debugging */
-    public final static boolean ENABLE_PHYSICAL_CLOCK = false;
+    public final static boolean ENABLE_PHYSICAL_CLOCK = true;
     
     /** experiment mode: output memory consumption, latency, etc. */
     public final static boolean EXPERIMENT = false;

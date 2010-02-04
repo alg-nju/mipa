@@ -39,7 +39,7 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 
 	private static final long serialVersionUID = 1230192910873066775L;
 
-	private int dimension;
+	protected int dimension;
 
 	/** store the current globalState */
 	private LocalState[] globalState;
@@ -55,6 +55,10 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 	private AbstractLatticeNode currentNode;
 
 	private ArrayList<LocalState> max;
+	
+	private int[] interNumArray;
+	
+	private boolean[] interNumFlag;
 
 	/** output the lattice constructor procedure information */
 	private PrintWriter out = null;
@@ -66,10 +70,14 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 
 		dimension = normalProcesses.length;
 		globalState = new LocalState[dimension];
+		interNumArray = new int[dimension];
+		interNumFlag = new boolean[dimension];
 		for (int i = 0; i < dimension; i++) {
 			LatticeVectorClock vc = new LatticeVectorClock(dimension);
 			vc.increment(i);
-			globalState[i] = new LocalState(i, vc, false);
+			interNumArray[i] = 0;
+			interNumFlag[i] = true;
+			globalState[i] = new LocalState(i, interNumArray[i], vc, false);
 		}
 		stateSet = new ArrayList<ArrayList<LocalState>>();
 		buffer = new ArrayList<ArrayList<LocalState>>();
@@ -105,7 +113,18 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 			Message mess = messages.get(i);
 			LatticeMessageContent content = (LatticeMessageContent) mess
 					.getMessageContent();
-			LocalState localstate = new LocalState(id, content.getlvc(),
+			
+			// compute interval number of current process
+			if(content.getlocalPredicate() == true){
+				if(interNumFlag[id] == true){
+					interNumArray[id]++;
+					interNumFlag[id] = false;
+				}
+			}else{
+				interNumFlag[id] = true;
+			}
+				
+			LocalState localstate = new LocalState(id, interNumArray[id], content.getlvc(),
 					content.getlocalPredicate());
 			// output the lattice constructor procedure information
 			try {

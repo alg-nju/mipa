@@ -120,5 +120,10 @@ public class ECAInitialize {
 
     public static void main(String[] args) {
         new ECAInitialize().initialize();
+        
+            Application app = new Application("config/predicate/" + "predicate_scp.xml");
+            app.start("config/config.xml");
+       
+        
     }
 }

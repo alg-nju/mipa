@@ -50,6 +50,7 @@ public class SCPLatticeChecker extends LatticeChecker {
 		// TODO Auto-generated constructor stub
 		try {
 			out = new PrintWriter(LOG_DIRECTORY + "/SCP.log");
+			out.println("ready!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -62,11 +63,17 @@ public class SCPLatticeChecker extends LatticeChecker {
 			AbstractLatticeNode currentNode) {
 		// TODO Auto-generated method stub
 		detectSCP(currentNode);
+		currentNode.getSCPNode().setvisited(true);
 	}
 
-	public void detectSCP(AbstractLatticeNode node) {
+	private void detectSCP(AbstractLatticeNode node) {
 
 		ArrayList<AbstractLatticeNode> pred = node.getprevious();
+		
+		//if the node is the initial node, pred is null.
+		if(pred.size()==0){
+			return;
+		}
 
 		Iterator<AbstractLatticeNode> itor = pred.iterator();
 		while (itor.hasNext()) {
@@ -87,7 +94,7 @@ public class SCPLatticeChecker extends LatticeChecker {
 			}
 		}
 
-		if (flag) {
+		if (flag&&node.getSCPNode().cgs()) {
 			// detect SCP
 			try {
 				application.callback(String.valueOf(true));
@@ -97,17 +104,39 @@ public class SCPLatticeChecker extends LatticeChecker {
 			count++;
 			out.print(count + " ");
 			String[] s = node.getID();
-			out.print(s + " ");
+			for(int i=0;i<s.length;i++) {
+				out.print(s[i] + " ");
+			}
 			LocalState[] gs = node.getglobalState();
 			for (int i = 0; i < gs.length; i++) {
-				String end = i + 1 != children.length ? " " : "\r\n";
-				out.print("[" + gs[i].getvc().toString() + "]" + end);
+				//String end = i + 1 != children.length ? " " : "\r\n";
+				out.print("[" + gs[i].getvc().toString() + "] ");
 				out.flush();
 			}
-			flag = false;
+			out.print("( ");
+			for (int i = 0; i < gs.length; i++) {
+				String end = i + 1 != children.length ? " " : " )\r\n";
+				out.print(gs[i].getintervalID() +end);
+				out.flush();
+			}
+			
+			node.getSCPNode().setpathflag(false);
+			
+			Iterator<AbstractLatticeNode> iter = pred.iterator();
+			String[] position=node.getID();
+			while(iter.hasNext()){
+				AbstractLatticeNode prenode = iterator.next();
+				//if (prenode.getID()[]) {
+					
+				//}
+			}
+			
+			
+		}else{
+			node.getSCPNode().setpathflag(flag || node.getSCPNode().cgs());
 		}
 
-		node.getSCPNode().setpathflag(flag || node.getSCPNode().cgs());
+		
 
 	}
 

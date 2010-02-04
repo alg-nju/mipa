@@ -22,7 +22,7 @@ package net.sourceforge.mipa.predicatedetection.lattice;
 import java.util.ArrayList;
 
 import net.sourceforge.mipa.predicatedetection.lattice.SCP.SCPLatticeNode;
-import net.sourceforge.mipa.predicatedetection.lattice.simplesequence.SSLatticeNode;
+//import net.sourceforge.mipa.predicatedetection.lattice.simplesequence.SSLatticeNode;
 import net.sourceforge.mipa.predicatedetection.lattice.wcp.WCPLatticeNode;
 
 /**
@@ -46,7 +46,7 @@ public abstract class AbstractLatticeNode {
 
 	protected SCPLatticeNode SCPNode = null;
 
-	protected SSLatticeNode SSNode = null;
+	//protected SSLatticeNode SSNode = null;
 
 	public AbstractLatticeNode(LocalState[] gs, String[] s) {
 		ID = s;
@@ -82,14 +82,14 @@ public abstract class AbstractLatticeNode {
 		return WCPNode;
 	}
 
-	public void setSSNode(SSLatticeNode SSNode) {
+/*	public void setSSNode(SSLatticeNode SSNode) {
 		this.SSNode = SSNode;
 	}
 
 	public SSLatticeNode getSSNode() {
 		return SSNode;
 	}
-
+*/
 	public void setSCPNode(SCPLatticeNode SCPNode) {
 		this.SCPNode = SCPNode;
 	}

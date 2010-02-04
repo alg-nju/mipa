@@ -160,7 +160,7 @@ public class PhysicalTimeCheck {
 	}
 	
 	public static void main(String args[]) {
-		String normalProcessFileList="log/NormalProcess0,log/NormalProcess1";
+		String normalProcessFileList="log/NormalProcess0.log,log/NormalProcess1.log";
 		
 		int k=0,n=1;
 		ArrayList<String> fileList=new ArrayList<String>();

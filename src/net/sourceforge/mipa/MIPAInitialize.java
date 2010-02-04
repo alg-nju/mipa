@@ -35,6 +35,7 @@ import net.sourceforge.mipa.components.ExponentDelayMessageDispatcher;
 import net.sourceforge.mipa.components.GroupManager;
 import net.sourceforge.mipa.components.MIPAResource;
 import net.sourceforge.mipa.components.MessageDispatcher;
+import net.sourceforge.mipa.components.NoDelayMessageDispatcher;
 import net.sourceforge.mipa.naming.IDManager;
 import net.sourceforge.mipa.naming.IDManagerImp;
 import net.sourceforge.mipa.naming.Naming;
@@ -94,8 +95,8 @@ public class MIPAInitialize {
             server.bind("ContextRegister", contextRegisterStub);
 
             //RandomDelayMessageDispatcher messageDispatcher = new RandomDelayMessageDispatcher();
-            //NoDelayMessageDispatcher messageDispatcher = new NoDelayMessageDispatcher();
-            ExponentDelayMessageDispatcher messageDispatcher = new ExponentDelayMessageDispatcher();
+            NoDelayMessageDispatcher messageDispatcher = new NoDelayMessageDispatcher();
+            //ExponentDelayMessageDispatcher messageDispatcher = new ExponentDelayMessageDispatcher();
             
             MessageDispatcher messageDispatcherStub 
                                     = (MessageDispatcher) UnicastRemoteObject

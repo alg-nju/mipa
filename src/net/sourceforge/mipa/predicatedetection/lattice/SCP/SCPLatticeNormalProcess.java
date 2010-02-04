@@ -19,11 +19,16 @@
  */
 package net.sourceforge.mipa.predicatedetection.lattice.SCP;
 
+import static config.Config.LOG_DIRECTORY;
+
+import java.io.PrintWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.sourceforge.mipa.components.Message;
 import net.sourceforge.mipa.components.MessageType;
+import net.sourceforge.mipa.naming.Catalog;
 import net.sourceforge.mipa.predicatedetection.AbstractNormalProcess;
 import net.sourceforge.mipa.predicatedetection.VectorClock;
 import net.sourceforge.mipa.predicatedetection.lattice.LatticeMessageContent;
@@ -38,16 +43,14 @@ public class SCPLatticeNormalProcess extends AbstractNormalProcess {
 
 	private static final long serialVersionUID = -3678254340220380477L;
 
-	/** stroe current local predicate value */
+	/** store current local predicate value */
 	private boolean localPredicate;
 
-	/** control whether send check message when lp is true */
-	private boolean tfirstflag;
-
-	/** control whether send check message when lp is false */
-	private boolean ffirstflag;
-
 	private Map<String, Long> currentMessageCount;
+	
+	private PrintWriter out;
+	private long pTimeLo;
+	private int index;
 
 	public SCPLatticeNormalProcess(String name, String[] checkers,
 			String[] normalProcesses) {
@@ -60,27 +63,33 @@ public class SCPLatticeNormalProcess extends AbstractNormalProcess {
 		for (int i = 0; i < checkers.length; i++) {
 			currentMessageCount.put(checkers[i], new Long(0));
 		}
-
+		
 		localPredicate = false;
+		
+		try {
+            out = new PrintWriter(LOG_DIRECTORY + "/" + name + ".log");
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        index=0;
 
-		tfirstflag = true;
-		ffirstflag = true;
 	}
 
 	@Override
 	public void action(boolean value) {
 
-		if ((value == true) && tfirstflag) {
-			tfirstflag = false;
-			ffirstflag = true;
+		if ((value == true) && (localPredicate == false)) {
 			localPredicate = true;
 
+			index++;
+			pTimeLo = (new Date()).getTime();
+			
 			// send message to other normal process
 			broadcast(MessageType.Control, null);
-
+			
 			// update vector clock
 			currentClock.increment(id);
-
+			
 			// localState changed, send localState to checker
 			LatticeVectorClock clock = new LatticeVectorClock(currentClock);
 			LatticeMessageContent content = new LatticeMessageContent(clock,
@@ -89,13 +98,20 @@ public class SCPLatticeNormalProcess extends AbstractNormalProcess {
 				String checker = checkers[i];
 				send(MessageType.Detection, checker, content);
 			}
-
-		} else if ((value == false) && ffirstflag) {
-			ffirstflag = false;
-			tfirstflag = true;
+			
+		} else if ((value == false) && (localPredicate == true)) {
 			localPredicate = false;
-
-			// update vector clock
+			
+			//out put the physical time, to compare with the lattice result
+			try {
+                long pTimeHi = (new Date()).getTime();
+                out.println(index + " " + pTimeLo + " " + pTimeHi);
+                out.flush();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            
+            // update vector clock
 			currentClock.increment(id);
 
 			// localState changed, send localState to checker
@@ -106,6 +122,7 @@ public class SCPLatticeNormalProcess extends AbstractNormalProcess {
 				String checker = checkers[i];
 				send(MessageType.Detection, checker, content);
 			}
+			
 		}
 
 	}
@@ -147,8 +164,6 @@ public class SCPLatticeNormalProcess extends AbstractNormalProcess {
 
 	@Override
 	public void receiveMsg(Message message) {
-		tfirstflag = true;
-		ffirstflag = true;
 		// update the vector clock
 		VectorClock timestamp = message.getTimestamp();
 		currentClock.update(timestamp);

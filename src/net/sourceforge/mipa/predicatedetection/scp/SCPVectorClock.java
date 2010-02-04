@@ -105,4 +105,13 @@ public class SCPVectorClock extends VectorClock {
         }
         return !(result && first);
     }
+    
+    public String toString() {
+        String string = "";
+        for (int i = 0; i < vectorClock.size(); i++) {
+            String clock = String.valueOf(vectorClock.get(i).longValue());
+            string=string + clock + " ";
+        }
+        return string.trim();
+    }
 }

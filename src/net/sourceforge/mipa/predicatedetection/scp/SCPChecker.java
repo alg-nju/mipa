@@ -158,11 +158,12 @@ public class SCPChecker extends AbstractFIFOChecker {
                     
                     if(ENABLE_PHYSICAL_CLOCK) {
                         String intervalID = foundContent.getIntervalID();
-                        long lo = foundContent.getpTimeLo();
-                        long hi = foundContent.getpTimeHi();
+                        //long lo = foundContent.getpTimeLo();
+                        //long hi = foundContent.getpTimeHi();
+          
                         try {
                             String end = i + 1 != children.length ? " " : "\n";
-                            out.print(intervalID + " " + lo + " " + hi + end);
+                            out.print(intervalID + " [" + foundContent.getLo().toString() + "] [" + foundContent.getHi().toString() +"]" +end);
                             out.flush();
                         } catch(Exception e) {
                             e.printStackTrace();

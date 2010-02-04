@@ -53,6 +53,9 @@ public class SCPNormalProcess extends AbstractNormalProcess {
     private PrintWriter out;
     
     private Map<String, Long> currentMessageCount;
+    
+    private int index;
+    
     /**
      * @param name
      */
@@ -70,6 +73,7 @@ public class SCPNormalProcess extends AbstractNormalProcess {
         
         prevState = false;
         firstflag = true;
+        index=0;
         
         if(ENABLE_PHYSICAL_CLOCK) {
             try {
@@ -96,6 +100,11 @@ public class SCPNormalProcess extends AbstractNormalProcess {
     @Override
     public void action(boolean value) {
         // TODO Auto-generated method stub
+    	
+    	if((value==true)&&(prevState==false)){
+    		index++;
+    	}
+    	
         if(prevState != value && firstflag) {
             if(prevState == false) {
                 //interval begins
@@ -121,7 +130,7 @@ public class SCPNormalProcess extends AbstractNormalProcess {
                         long pTimeHi = (new Date()).getTime();
                         content.setpTimeLo(pTimeLo);
                         content.setpTimeHi(pTimeHi);
-                        out.println(intervalID + " " + pTimeLo + " " + pTimeHi);
+                        out.println(index + " " + pTimeLo + " " + pTimeHi);
                         out.flush();
                     } catch(Exception e) {
                         e.printStackTrace();

@@ -29,15 +29,25 @@ import net.sourceforge.mipa.predicatedetection.lattice.LocalState;
  */
 public class SCPLatticeNode extends AbstractLatticeNode {
 
+	/**record whether all the path to the current node satisfy the predicate**/
 	private boolean pathflag;
 
+	/**record whether the node has been checked**/
 	private boolean visited;
+	
+	/**record whether the node is the tail of the lattice**/
+	private boolean tailflag;
+	
+	/**record whether the node is inside the continuous true-value nodes region**/
+	private boolean insideflag;
 
 	public SCPLatticeNode(LocalState[] gs, String[] s) {
 		super(gs, s);
 		// TODO Auto-generated constructor stub
 		pathflag = false;
 		visited = false;
+		tailflag = false;
+		insideflag = false;
 	}
 
 	public boolean getvisited() {
@@ -54,6 +64,22 @@ public class SCPLatticeNode extends AbstractLatticeNode {
 
 	public void setpathflag(boolean pathflag) {
 		this.pathflag = pathflag;
+	}
+	
+	public boolean gettailflag() {
+		return tailflag;
+	}
+
+	public void settailflag(boolean tailflag) {
+		this.tailflag = tailflag;
+	}
+	
+	public boolean getinsideflag() {
+		return insideflag;
+	}
+
+	public void setinsideflag(boolean insideflag) {
+		this.insideflag = insideflag;
 	}
 
 	/**

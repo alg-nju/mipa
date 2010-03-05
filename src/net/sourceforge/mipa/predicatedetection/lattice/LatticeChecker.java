@@ -152,7 +152,7 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 		}
 	}
 
-	private void bufferrecursion(int pID) {
+/*	private void bufferrecursion(int pID) {
 		boolean b = false;
 		for (int i = 0; i < dimension; i++) {
 			if ((i != pID)) {
@@ -190,13 +190,6 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 			}
 		}
 	}
-
-	/**
-	 * check whether the state is happen-before ordered.
-	 * 
-	 * @param state
-	 * @return
-	 */
 	private boolean buffer(LocalState state) {
 		boolean result = false;
 		int pID = state.processID;
@@ -254,7 +247,57 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 		}
 		return result;
 	}
+*/
 
+/**
+ * check whether the state is happen-before ordered.
+ * 
+ * fix Issue 15.
+ * 
+ * @param state
+ * @return
+ */
+private boolean buffer(LocalState state) {
+	
+	boolean result = false;
+	int pID = state.processID;
+	buffer.get(pID).add(state);
+	
+	int index=pID;
+	while(index<dimension){
+		boolean flag = true;
+
+		if(buffer.get(index).size()>0){
+			for (int i = 0; i < dimension; i++) {
+				if ((i != index) && (globalState[i].vc.lessThan(buffer.get(index).get(0).vc))) {
+					flag = false;
+				}
+			}
+		}else{
+			flag = false;
+		}
+		
+		if(flag){
+			// output the lattice constructor procedure information
+			try {
+				out.println("to call expandLattice(state), state's vector clcok is"
+								+ buffer.get(index).get(0).vc.toString());
+				out.flush();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			expandLattice(buffer.get(index).get(0));
+			buffer.get(index).remove(0);
+			result = true;
+			index=0;
+		}else{
+			index++;
+		}
+	}
+	
+	return result;
+}
 	/**
 	 * compute the set of state, which is pre-concurrent with state s and is
 	 * maximum of each process

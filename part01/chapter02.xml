@@ -21,7 +21,7 @@
   </orderedlist>
   
   <sect1 id="mipa.a-simple-example.predicate">
-	<title>Specifying a Context Predicate</title>
+	<title>Specification of a Context Predicate</title>
   
 	<para>We provide the <link
 	  linkend="mipa.principle.predicate.definition">PDCC framework</link> for users to

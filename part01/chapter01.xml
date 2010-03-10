@@ -6,16 +6,20 @@
 
   <sect1 id="mipa.intro.section-1">
     <title>Context-aware Computing</title>
-    <para>Pervasive applications are typically context-aware, using various kinds of contexts, such as location and time, to provide smart services. Context-aware applications need to monitor whether contexts bear specified property, thus being able to adapt to the pervasive computing environment accordingly. This brings the critical issue of context consistency checking, i.e. checking of specified constraints on properties of contexts.</para>
-
-    <para>Context consistency checking is especially challenging in asynchronous environments, where the computing entities do not have a global clock and communications suffer from finite but arbitrary delay. Moreover, context collecting devices (often resource-constrained sensors) may also delay the dissemination of context data due to resource constraints. The asynchrony caused by different data dissemination rates on different devices cannot be easily solved by existing clock synchronization schemes.</para>
-
-    <para>Predicate detection is a promising approach to context consistency checking in asynchronous environments. Predicate detection basically relies on the classical Lamport's definition of the happen-before relationship resulting from message causality, and its "on the fly" coding given by logical vector clocks.</para>
+    <para>Pervasive computing creates environments that embed computation and communication in a way that organically interacts with humans to enhance or ease their daily behavior. Contexts refer to the pieces of information that capture the characteristics of computing environments, and context-awareness allows applications to dynamically adapt to the pervasive computing environment.
+</para>
   </sect1>
-  <sect1 id="mipa.intro.section-2">
-    <title>Achieving Context-awareness Based on MIPA in Asynchronous Pervasive Computing Environments</title>
-    <para>We develop the Middleware Infrastructure for Predicate detection in Asynchronous environments (MIPA), to support Predicate Detection-based Consistency Checking for pervasive context (PDCC) in pervasive computing environments. MIPA aims at supporting the development and deployment of various predicate detection-based context consistency checking schemes for different pervasive computing scenarios.</para>
   
+  <sect1 id="mipa.intro.section-2">
+      <title>PDPC - Property Detection for Pervasive Context</title>
+    <para>PDPC (Property Detection for Pervasive Context) is one of the primary approaches to achieving context-awareness. Specifically, context-aware applications need to detect whether contexts bear user-specified properties, in order to adapt their behavior accordingly. For example, in a smart office scenario, the user may specify a constraint on property of the contexts: "Location of the user is the lecture room and a presentation is going on in the lecture room". Thus the application can adaptively turn mobile phone of the user to vibration mode when the property is satisfied. Moreover, contexts are often error-prone due to noises. Users may specify properties which accurate contexts must obey, in order to prune noisy contexts. For example, users may specify that: "no one appears in two different places at the same time", to make sure that the location context is correctly collected.</para>
+</sect1>
+
+  <sect1 id="mipa.intro.section-3">
+      <title>Achieving Context-awareness Based on MIPA in Asynchronous Pervasive Computing Environments</title>
+
+      <para> We develop MIPA - the Middleware Infrastructure for Predicate detection in Asynchronous environments - to support PDPC in pervasive computing environments. MIPA aims at supporting the development and deployment of various predicate detection-based context consistency checking schemes for different pervasive computing scenarios. </para>
+
     <note>
       <para>MIPA is an open-source middleware currently hosted on Googlecode at http://mipa.googlecode.com/.</para>
       <para>Please refer to our techical papers

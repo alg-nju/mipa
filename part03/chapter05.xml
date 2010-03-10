@@ -7,16 +7,15 @@
   </para>
 
   <sect1 id="mipa.principle.predicate.definition">
-	<title>PDCC framework</title>
+	<title>The PDPC framework</title>
   
-	<para>The definition of PDCC will be described in this section. The DTD of
-	predicate will be explained.</para>
+	<para>The definition of PDPC will be described in this section. The DTD of predicate will be explained.</para>
   </sect1>
 
   <sect1 id="mipa.principle.predicate.example">
-	<title>Examples of PDCC</title>
+	<title>Examples of predicates under the PDPC framework</title>
   
-	<para>Some examples will be put here.</para>
+	<para>Examples of predicates.</para>
   </sect1>
 
 </chapter>

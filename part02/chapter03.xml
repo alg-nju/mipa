@@ -9,9 +9,9 @@
   </para>
 
   <sect1 id="mipa.usage.user.predicate">
-	<title>Specify a predicate</title>
+	<title>Specifying a predicate</title>
   
-	<para>This section is about how to write the predicate description with PDCC framework.</para>
+	<para>This section is about how to write the predicate description with PDPC framework.</para>
 	<para>
 	  <!-- An example for inserting an image into the DocBook. -->
 	    <mediaobject>
@@ -24,13 +24,13 @@
   </sect1>
 
     <sect1 id="mipa.usage.user.application">
-	<title>Write an application</title>
+	<title>Developing an application</title>
   
 	<para>This section is about how to write an application with callback interface.</para>
   </sect1>
 
   <sect1 id="mipa.usage.user.sensor">
-	<title>Specify sensors</title>
+	<title>Configuring sensor agents</title>
 	
 	<para>This section is about how to write some sensors with plug-in mechanism.</para>
   </sect1>

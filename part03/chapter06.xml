@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="mipa.principle.pd">
-  <title>Predicate Detection (PD)</title>
+  <title>Predicate Detection</title>
   
   <para>This chapter is about the principle of PD.
 	<note>Under construction.</note>
   </para>
 
   <sect1 id="mipa.principle.pd.workflow">
-	<title>Workflow of PD</title>
+	<title>The basic predicate detection process</title>
   
-	<para>An overview of workflow of PD will be described here.</para>
+	<para>An overview of process of PD will be presented here.</para>
   </sect1>
 
   <sect1 id="mipa.principle.pd.predicate-parser">
@@ -19,9 +19,9 @@
   </sect1>
 
   <sect1 id="mipa.principle.pd.group-manager">
-	<title>Group manager</title>
+	<title>Resource manager</title>
   
-	<para>Group manager module will be explained in this section.</para>
+	<para>The resource lookup process will be explained in this section.</para>
   </sect1>
 
   <sect1 id="mipa.principle.pd.message-dispatcher">
@@ -30,8 +30,14 @@
 	<para>Message dispatcher module will be explained in this section.</para>
   </sect1>
 
+<sect1 id="mipa.principle.pd.non-checker">
+	<title>Establishing the happen-before realtion among the non-checker processes</title>
+	
+	<para> Establishing the required happen-before relation via message exchange. </para>
+  </sect1>
+
   <sect1 id="mipa.principle.pd.checker">
-	<title>Checker</title>
+	<title>Predicate detection by the checker process</title>
 	
 	<para>Checker</para>
   </sect1>

@@ -54,10 +54,8 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 
 	private AbstractLatticeNode currentNode;
 
-	private ArrayList<LocalState> max;
-	
 	private int[] interNumArray;
-	
+
 	private boolean[] interNumFlag;
 
 	/** output the lattice constructor procedure information */
@@ -81,7 +79,6 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 		}
 		stateSet = new ArrayList<ArrayList<LocalState>>();
 		buffer = new ArrayList<ArrayList<LocalState>>();
-		max = new ArrayList<LocalState>();
 
 		String[] s = new String[dimension];
 		for (int i = 0; i < dimension; i++) {
@@ -89,7 +86,6 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 			stateSet.get(i).add(globalState[i]);
 			buffer.add(new ArrayList<LocalState>());
 			// buffer.get(i).add(globalState[i]);
-			max.add(globalState[i]);
 			s[i] = "0";
 		}
 
@@ -113,19 +109,19 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 			Message mess = messages.get(i);
 			LatticeMessageContent content = (LatticeMessageContent) mess
 					.getMessageContent();
-			
+
 			// compute interval number of current process
-			if(content.getlocalPredicate() == true){
-				if(interNumFlag[id] == true){
+			if (content.getlocalPredicate() == true) {
+				if (interNumFlag[id] == true) {
 					interNumArray[id]++;
 					interNumFlag[id] = false;
 				}
-			}else{
+			} else {
 				interNumFlag[id] = true;
 			}
-				
-			LocalState localstate = new LocalState(id, interNumArray[id], content.getlvc(),
-					content.getlocalPredicate());
+
+			LocalState localstate = new LocalState(id, interNumArray[id],
+					content.getlvc(), content.getlocalPredicate());
 			// output the lattice constructor procedure information
 			try {
 				out.println(mess.getMessageID() + ", " + normalProcess + ", "
@@ -152,180 +148,58 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 		}
 	}
 
-/*	private void bufferrecursion(int pID) {
-		boolean b = false;
-		for (int i = 0; i < dimension; i++) {
-			if ((i != pID)) {
-				while ((buffer.get(i).size() > 0)) {
-					boolean bo = true;
-					for (int j = 0; j < dimension; j++) {
-						if ((j != i)
-								&& (globalState[j].vc.lessThan(buffer.get(i)
-										.get(0).vc))) {
-							bo = false;
-						}
-					}
-					if (bo) {
-						// output the lattice constructor procedure information
-						try {
-							out
-									.println("to call expandLattice(state), state's vector clcok is"
-											+ buffer.get(i).get(0).vc
-													.toString());
-							out.flush();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						expandLattice(buffer.get(i).get(0));
-						buffer.get(i).remove(0);
-						b = true;
-					} else {
-						break;
-					}
-				}
-				if (b) {
-					bufferrecursion(i);
-					break;
-				}
-			}
-		}
-	}
+	/**
+	 * check whether the state is happen-before ordered.
+	 * 
+	 * fix Issue 15.
+	 * 
+	 * @param state
+	 * @return
+	 */
 	private boolean buffer(LocalState state) {
+
 		boolean result = false;
 		int pID = state.processID;
-		if (buffer.get(pID).size() == 0) {
-			boolean b = true;
-			for (int i = 0; i < dimension; i++) {
-				if ((i != pID) && (globalState[i].vc.lessThan(state.vc))) {
-					b = false;
-				}
-			}
-			if (b) {
-				// buffer.get(pID).remove(0);
-				// buffer.get(pID).add(state);
+		buffer.get(pID).add(state);
 
+		int index = pID;
+		while (index < dimension) {
+			boolean flag = true;
+
+			if (buffer.get(index).size() > 0) {
+				for (int i = 0; i < dimension; i++) {
+					if ((i != index)
+							&& (globalState[i].vc.lessThan(buffer.get(index)
+									.get(0).vc))) {
+						flag = false;
+					}
+				}
+			} else {
+				flag = false;
+			}
+
+			if (flag) {
 				// output the lattice constructor procedure information
 				try {
 					out
 							.println("to call expandLattice(state), state's vector clcok is"
-									+ state.vc.toString());
+									+ buffer.get(index).get(0).vc.toString());
 					out.flush();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
-				expandLattice(state);
+				expandLattice(buffer.get(index).get(0));
+
+				buffer.get(index).remove(0);
 				result = true;
-
-				// recursive check the other processes whether have new state to
-				// extend
-				bufferrecursion(pID);
-
+				index = 0;
 			} else {
-				buffer.get(pID).add(state);
-
-				// output the lattice constructor procedure information
-				try {
-					out.println("store in buffer, state's vector clcok is"
-							+ state.vc.toString());
-					out.flush();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				index++;
 			}
-		} else {
-
-			// output the lattice constructor procedure information
-			try {
-				out.println("store in buffer, state's vector clcok is"
-						+ state.vc.toString());
-				out.flush();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			buffer.get(pID).add(state);
 		}
+
 		return result;
-	}
-*/
-
-/**
- * check whether the state is happen-before ordered.
- * 
- * fix Issue 15.
- * 
- * @param state
- * @return
- */
-private boolean buffer(LocalState state) {
-	
-	boolean result = false;
-	int pID = state.processID;
-	buffer.get(pID).add(state);
-	
-	int index=pID;
-	while(index<dimension){
-		boolean flag = true;
-
-		if(buffer.get(index).size()>0){
-			for (int i = 0; i < dimension; i++) {
-				if ((i != index) && (globalState[i].vc.lessThan(buffer.get(index).get(0).vc))) {
-					flag = false;
-				}
-			}
-		}else{
-			flag = false;
-		}
-		
-		if(flag){
-			// output the lattice constructor procedure information
-			try {
-				out.println("to call expandLattice(state), state's vector clcok is"
-								+ buffer.get(index).get(0).vc.toString());
-				out.flush();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			expandLattice(buffer.get(index).get(0));
-			buffer.get(index).remove(0);
-			result = true;
-			index=0;
-		}else{
-			index++;
-		}
-	}
-	
-	return result;
-}
-	/**
-	 * compute the set of state, which is pre-concurrent with state s and is
-	 * maximum of each process
-	 * 
-	 * @param s
-	 */
-	private void updateMax(LocalState s) {
-
-		int pID = s.processID;
-		ArrayList<LocalState> pred = new ArrayList<LocalState>();
-		for (int i = 0; i < dimension; i++) {
-			if (i != pID) {
-				if (stateSet.get(i).size() < 2) {
-					continue;
-				}
-				LocalState state = stateSet.get(i).get(1);
-				if (state.vc.lessThan(s.vc)) {
-					pred.add(stateSet.get(i).get(0));
-				}
-			} else {
-				pred.add(stateSet.get(i).get(1));
-			}
-		}
-		Iterator<LocalState> iter = pred.iterator();
-		while (iter.hasNext()) {
-			max.remove(iter.next());
-		}
-		// max.add(0, s);
 	}
 
 	/**
@@ -356,10 +230,8 @@ private boolean buffer(LocalState state) {
 		if (firstneq && (position > -1)) {
 			firstneq = false;
 			for (int j = 0; j < stateSet.get(position).size() - 1; j++) {
-				if ((node2.globalState[position] == stateSet.get(position).get(
-						j))
-						&& (node1.globalState[position] == stateSet.get(
-								position).get(j + 1))) {
+				if ((node2.globalState[position] == stateSet.get(position).get(j))
+						&& (node1.globalState[position] == stateSet.get(position).get(j + 1))) {
 					firstneq = true;
 				}
 			}
@@ -390,6 +262,10 @@ private boolean buffer(LocalState state) {
 		currentNode.next.add(node);
 		node.previous.add(currentNode);
 		currentNode = node;
+		LocalState[] cgs = new LocalState[globalState.length];
+		for (int i = 0; i < globalState.length; i++) {
+			cgs[i] = globalState[i];
+		}
 
 		// output the lattice constructor procedure information
 		try {
@@ -403,136 +279,104 @@ private boolean buffer(LocalState state) {
 			e.printStackTrace();
 		}
 
-		updateMax(state);
-		if (max.size() > 0) { // generate Lattice
-			ArrayList<LocalState> sList = new ArrayList<LocalState>();
-			Iterator<LocalState> iter = max.iterator();
-			while (iter.hasNext()) {
-				sList.add(iter.next());
-			}
-			Stack<LocalState> stateStack = new Stack<LocalState>();
-			Stack<AbstractLatticeNode> nodeStack = new Stack<AbstractLatticeNode>();
-			Stack<ArrayList<LocalState>> listStack = new Stack<ArrayList<LocalState>>();
-			listStack.push(sList);
-			nodeStack.push(currentNode);
-			stateStack.push(sList.get(0));
-			while (!listStack.empty()) {
-				ArrayList<LocalState> list = listStack.pop();
-				if (list.size() > 0) {
-					LocalState st = list.get(0);
-					list.remove(0);
-					listStack.push(list);
-					stateStack.push(st);
-					nodeStack.push(currentNode);
+		// recursively construct the branch of the lattice
+		dfs_construction(pID, currentNode, cgs);
+	}
 
-					ArrayList<LocalState> stateList = stateSet
-							.get(st.processID);
-					Iterator<LocalState> it = stateList.iterator();
-					while (it.hasNext()) {
-						LocalState s = it.next();
-						if (s == st) {
-							if (it.hasNext()) {
-								// create new LatticeNode by rollbacking state
-								// st,
-								// and build the link relation ship with existed
-								// node
-								LocalState news = it.next();
-								globalState[st.processID] = news;
-								for (int j = 0; j < dimension; j++) {
-									int temp = stateSet.get(j).size()
-											- stateSet.get(j).indexOf(
-													globalState[j]) - 1;
-									str[j] = String.valueOf(temp);
-								}
-								AbstractLatticeNode newnode = createNode(
-										globalState, str);
-								// check whether the node has been created.
-								ArrayList<AbstractLatticeNode> nodelist = currentNode.previous;
-								Iterator<AbstractLatticeNode> nodeiter = nodelist
-										.iterator();
-								boolean bool = false;
-								while (nodeiter.hasNext()) {
-									AbstractLatticeNode lnode = nodeiter.next();
-									if (compare(lnode, newnode) == 0) {
-										bool = true;
-									}
-								}
-								if (bool) {
-									listStack.push(new ArrayList<LocalState>());
-									break;
-								}
-
-								// output the lattice constructor procedure
-								// information
-								try {
-									out.print("inside created new node: ");
-									for (int m = 0; m < dimension; m++) {
-										String end = m + 1 != dimension ? " "
-												: "\r\n";
-										out.print(newnode.getID()[m] + end);
-									}
-									out.flush();
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-
-								// if not created, add into the lattice.
-								currentNode.previous.add(newnode);
-								newnode.next.add(currentNode);
-								for (int j = 0; j < currentNode.previous.size() - 1; j++) {
-									AbstractLatticeNode pnode = currentNode.previous
-											.get(j);
-									for (int k = 0; k < pnode.previous.size(); k++) {
-										AbstractLatticeNode ppnode = pnode.previous
-												.get(k);
-										if (compare(ppnode, newnode) == 1) {
-											ppnode.next.add(newnode);
-											newnode.previous.add(ppnode);
-										}
-									}
-								}
-								currentNode = newnode;
-								// compute the new LatticeNode's list
-								ArrayList<LocalState> new_s = new ArrayList<LocalState>();
-								for (int k = 0; k < dimension; k++) {
-									if ((k != pID)) {
-										int index = stateSet.get(k).indexOf(
-												globalState[k]);
-										boolean flag = true;
-										if (index + 1 < stateSet.get(k).size()) {
-											LocalState comps = stateSet.get(k)
-													.get(index + 1);
-											for (int j = 0; j < dimension; j++) {
-												if ((j != k)
-														&& (comps.vc
-																.lessThan(globalState[j].vc))) {
-													flag = false;
-												}
-											}
-										} else {
-											flag = false;
-										}
-										if (flag) {
-											new_s.add(globalState[k]);
-										}
-									}
-								}
-								listStack.push(new_s);
-							} else {
-								listStack.push(new ArrayList<LocalState>());
-							}
-							break;
+	/**
+	 * deep-first recursively construct the branch of the lattice
+	 * 
+	 * @param
+	 * @return
+	 */
+	private void dfs_construction(int pID, AbstractLatticeNode cur_node,
+			LocalState[] cgs) {
+		// compute the cur_node's max_list
+		ArrayList<LocalState> max = new ArrayList<LocalState>();
+		for (int k = 0; k < dimension; k++) {
+			if (k != pID) {
+				int index = stateSet.get(k).indexOf(cgs[k]);
+				// if the process_k has state to roll back
+				if (index + 1 < stateSet.get(k).size()) {
+					boolean flag = true;
+					LocalState comps = stateSet.get(k).get(index + 1);
+					for (int j = 0; j < dimension; j++) {
+						if ((j != k) && (comps.vc.lessThan(cgs[j].vc))) {
+							flag = false;
 						}
 					}
-				} else {
-					LocalState s = stateStack.pop();
-					globalState[s.processID] = s;
-					currentNode = nodeStack.pop();
+					// if the state could roll back
+					if (flag) {
+						max.add(comps);
+					}
 				}
 			}
 		}
-		max.add(state);
+		// for every state in max, create new node, recurse the procedure.
+		if (max.size() < 1) {
+			return;
+		} else {
+			Iterator<LocalState> iter = max.iterator();
+			while (iter.hasNext()) {
+				LocalState s = iter.next();
+				LocalState[] gs = new LocalState[cgs.length];
+				for (int i = 0; i < cgs.length; i++) {
+					gs[i] = cgs[i];
+				}
+				gs[s.processID] = s;
+				String[] str = new String[dimension];
+				for (int j = 0; j < dimension; j++) {
+					int temp = stateSet.get(j).size()
+							- stateSet.get(j).indexOf(gs[j]) - 1;
+					str[j] = String.valueOf(temp);
+				}
+				AbstractLatticeNode newnode = createNode(gs, str);
+				// check whether the node has been created.
+				ArrayList<AbstractLatticeNode> nodelist = cur_node.previous;
+				Iterator<AbstractLatticeNode> nodeiter = nodelist.iterator();
+				boolean bool = false;
+				while (nodeiter.hasNext()) {
+					AbstractLatticeNode lnode = nodeiter.next();
+					if (compare(lnode, newnode) == 0) {
+						bool = true;
+					}
+				}
+				// if the node has been created
+				if (bool) {
+					continue;
+				} else {
+					//output the lattice constructor procedure information
+					try {
+						out.print("inside created new node: ");
+						for (int m = 0; m < dimension; m++) {
+							String end = m + 1 != dimension ? " "
+									: "\r\n";
+							out.print(newnode.getID()[m] + end);
+						}
+						out.flush();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					cur_node.previous.add(newnode);
+					newnode.next.add(cur_node);
+					// ²¹±ß
+					for (int j = 0; j < cur_node.previous.size() - 1; j++) {
+						AbstractLatticeNode pnode = cur_node.previous.get(j);
+						for (int k = 0; k < pnode.previous.size(); k++) {
+							AbstractLatticeNode ppnode = pnode.previous.get(k);
+							if (compare(ppnode, newnode) == 1) {
+								ppnode.next.add(newnode);
+								newnode.previous.add(ppnode);
+							}
+						}
+					}
+					// recursively construct
+					dfs_construction(pID, newnode, gs);
+				}
 
+			}
+		}
 	}
 
 	public abstract AbstractLatticeNode createNode(LocalState[] globalState,

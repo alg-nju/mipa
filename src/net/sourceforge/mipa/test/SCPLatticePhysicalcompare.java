@@ -14,8 +14,12 @@ public class SCPLatticePhysicalcompare {
 		boolean flag=true;
 		try {
 			PrintWriter out = new PrintWriter(LOG_DIRECTORY + "/SCP_Lattice_Physical.log");
-			BufferedReader br_p=new BufferedReader(new FileReader(LOG_DIRECTORY + "/result_re.log"));
-			BufferedReader br_l=new BufferedReader(new FileReader(LOG_DIRECTORY + "/SCP_re.log"));
+			//BufferedReader br_p=new BufferedReader(new FileReader(LOG_DIRECTORY + "/result_re.log"));
+			//BufferedReader br_l=new BufferedReader(new FileReader(LOG_DIRECTORY + "/SCP_re.log"));
+			
+			BufferedReader br_p=new BufferedReader(new FileReader(LOG_DIRECTORY + "/result.txt"));
+			BufferedReader br_l=new BufferedReader(new FileReader(LOG_DIRECTORY + "/SCP.log"));
+			br_l.readLine();
 			
 			ArrayList<String> arrayp=new ArrayList<String>();
 			while(br_p.ready()){

@@ -1,32 +1,47 @@
-<!ELEMENT predicate (prefix, GSE)>
-<!ATTLIST predicate type (SCP|WCP|OGAP|LP|CADA) #REQUIRED>
-<!ELEMENT prefix EMPTY>
-<!ATTLIST prefix value (def|pos) #REQUIRED>
+<!ELEMENT predicate (CGSs, specification)>
+<!ATTLIST predicate type (SCP|WCP|OGA|LP|CADA|SEQUENCE) #REQUIRED>
 
-<!ELEMENT GSE (CGS, global)+>
-<!ATTLIST GSE value (conjunction|disjunction) #REQUIRED>
-
+<!-- CGS definition -->
+<!ELEMENT CGSs (CGS)+>
 <!ELEMENT CGS (LP)+>
-<!ATTLIST CGS value (conjunction|disjunction) #REQUIRED>
-
-<!ELEMENT global (#PCDATA)>
+<!ATTLIST CGS 
+	name CDATA #REQUIRED
+	value (conjunction|disjunction) #IMPLIED>
 
 <!-- local predicate definition -->
 <!ELEMENT LP (formula)>
 <!ELEMENT formula ((quantifier, formula)|(formula, binary, formula)|(unary, formula)|atom)>
+
 <!-- quantifier contains symbol and variable -->
 <!ELEMENT quantifier (#PCDATA)>
 <!ATTLIST quantifier value (universal|existential) #REQUIRED>
-
 <!ELEMENT binary EMPTY>
 <!ATTLIST binary value (conjunction|disjunction|imply) #REQUIRED>
-
 <!ELEMENT unary EMPTY>
 <!ATTLIST unary value (not) #IMPLIED>
 
 <!-- operator: ==, great-than, not-great-than, less-than, not-less-than, etc. -->
 <!ELEMENT atom EMPTY>
 <!ATTLIST atom
-  operator CDATA #REQUIRED
-  name CDATA #REQUIRED
-  value CDATA #REQUIRED>
+	operator CDATA #REQUIRED
+	name CDATA #REQUIRED
+	value CDATA #REQUIRED>
+
+<!-- specification definition -->
+<!ELEMENT specification (prefix, GSE)>
+<!ELEMENT prefix EMPTY>
+<!ATTLIST prefix value (def|pos) #REQUIRED>
+
+<!ELEMENT GSE (element+, global)>
+<!ATTLIST GSE value (conjunction|disjunction) #REQUIRED>
+
+<!ELEMENT element (zeroOrMore|oneOrMore|choice|optional|cgs)>
+<!ELEMENT zeroOrMore (element)+>
+<!ELEMENT oneOrMore (element)+>
+<!ELEMENT choice (element,(element)+)>
+<!ELEMENT optional (element)+>
+<!ELEMENT cgs EMPTY>
+<!ATTLIST cgs name CDATA #REQUIRED>
+<!ELEMENT global (#PCDATA)>
+
+

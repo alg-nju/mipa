@@ -42,6 +42,10 @@ public class Connector extends Composite{
             System.out.println("Operator "+ operator +" not defined!");
         }
     }
+    
+    public void setOperator(NodeType operator) {
+        this.operator = operator;
+    }
 
     public NodeType getOperator() {
         return operator;

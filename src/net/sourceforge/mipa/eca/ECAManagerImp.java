@@ -38,6 +38,7 @@ import net.sourceforge.mipa.predicatedetection.Atom;
 import net.sourceforge.mipa.predicatedetection.LocalPredicate;
 import net.sourceforge.mipa.predicatedetection.NormalProcess;
 import net.sourceforge.mipa.predicatedetection.lattice.scp.SCPLatticeNormalProcess;
+import net.sourceforge.mipa.predicatedetection.lattice.sequence.SequenceLatticeNormalProcess;
 import net.sourceforge.mipa.predicatedetection.lattice.wcp.WCPLatticeNormalProcess;
 import net.sourceforge.mipa.predicatedetection.normal.cada.CADANormalProcess;
 import net.sourceforge.mipa.predicatedetection.normal.oga.OGANormalProcess;
@@ -58,8 +59,8 @@ public class ECAManagerImp implements ECAManager {
 
     private DataSource dataSource;
 
-    public ECAManagerImp(BrokerInterface broker,
-                         DataSource dataSource, String ecaManagerName) {
+    public ECAManagerImp(BrokerInterface broker, DataSource dataSource,
+            String ecaManagerName) {
         this.setBroker(broker);
         this.ecaManagerName = ecaManagerName;
         this.dataSource = dataSource;
@@ -97,15 +98,13 @@ public class ECAManagerImp implements ECAManager {
 
     @Override
     public void registerLocalPredicate(LocalPredicate localPredicate,
-                                       String name, 
-                                       Group g)
-                                           throws RemoteException {
+            String name, Group g) throws RemoteException {
         // EXPERIMENT
         TimeInfo timeInfo = new TimeInfo();
         if (EXPERIMENT) {
             timeInfo.item_1_begin = System.nanoTime();
         }
-        
+
         try {
             Naming server = MIPAResource.getNamingServer();
 
@@ -122,78 +121,89 @@ public class ECAManagerImp implements ECAManager {
 
             Listener action = null;
             NormalProcess npStub = null;
-            
+
             CheckMode checkMode = MIPAResource.getCheckMode();
-            if(checkMode == CheckMode.NORMAL) {
+            if (checkMode == CheckMode.NORMAL) {
                 // NORMAL mode code puts here!
-                switch(g.getType()) {
+                switch (g.getType()) {
                 case SCP:
-                    SCPNormalProcess scpNP = new SCPNormalProcess(name, checkers,
-                                                                normalProcesses);
-                    npStub = (NormalProcess) UnicastRemoteObject
-                                                            .exportObject(scpNP, 0);
+                    SCPNormalProcess scpNP = new SCPNormalProcess(name,
+                            checkers, normalProcesses);
+                    npStub = (NormalProcess) UnicastRemoteObject.exportObject(
+                            scpNP, 0);
                     action = scpNP;
-                
+
                     break;
                 case OGA:
                     String[] subMembers = new String[g.getSubMembers().size()];
                     g.getSubMembers().toArray(subMembers);
-                    OGANormalProcess ogaNP = new OGANormalProcess(name, checkers,
-                                                                   normalProcesses,
-                                                                   subMembers);
-                    npStub = (NormalProcess) UnicastRemoteObject
-                                                            .exportObject(ogaNP, 0);
+                    OGANormalProcess ogaNP = new OGANormalProcess(name,
+                            checkers, normalProcesses, subMembers);
+                    npStub = (NormalProcess) UnicastRemoteObject.exportObject(
+                            ogaNP, 0);
                     action = ogaNP;
                     break;
                 case WCP:
-                    WCPNormalProcess wcpNP = new WCPNormalProcess(name, checkers,
-                                                                   normalProcesses);
-                    npStub = (NormalProcess) UnicastRemoteObject
-                                                            .exportObject(wcpNP, 0);
+                    WCPNormalProcess wcpNP = new WCPNormalProcess(name,
+                            checkers, normalProcesses);
+                    npStub = (NormalProcess) UnicastRemoteObject.exportObject(
+                            wcpNP, 0);
                     action = wcpNP;
                     break;
                 case LP:
-                
+
                     break;
                 case CADA:
-                    CADANormalProcess cadaNP = new CADANormalProcess(name, checkers,
-                            normalProcesses);
-                    npStub = (NormalProcess) UnicastRemoteObject
-                                                            .exportObject(cadaNP, 0);
+                    CADANormalProcess cadaNP = new CADANormalProcess(name,
+                            checkers, normalProcesses);
+                    npStub = (NormalProcess) UnicastRemoteObject.exportObject(
+                            cadaNP, 0);
                     action = cadaNP;
                     break;
+                case SEQUENCE:
+
+                    break;
                 default:
-                    System.out.println("Type " + g.getType() + " has not been defined.");
+                    System.out.println("Type " + g.getType()
+                            + " has not been defined.");
                 }
-            } else if(checkMode == CheckMode.LATTICE) {
+            } else if (checkMode == CheckMode.LATTICE) {
                 // LATTICE mode code puts here!
-                switch(g.getType()) {
+                switch (g.getType()) {
                 case WCP:
-                    WCPLatticeNormalProcess wcpNP = new WCPLatticeNormalProcess(name, checkers,
-                                                                             normalProcesses);
-                    npStub = (NormalProcess) UnicastRemoteObject
-                                                            .exportObject(wcpNP, 0);
+                    WCPLatticeNormalProcess wcpNP = new WCPLatticeNormalProcess(
+                            name, checkers, normalProcesses);
+                    npStub = (NormalProcess) UnicastRemoteObject.exportObject(
+                            wcpNP, 0);
                     action = wcpNP;
                     break;
                 case SCP:
-                	SCPLatticeNormalProcess scpNP = new SCPLatticeNormalProcess(name, checkers,
-					                            normalProcesses);
-					npStub = (NormalProcess) UnicastRemoteObject
-					           .exportObject(scpNP, 0);
-					action = scpNP;
+                    SCPLatticeNormalProcess scpNP = new SCPLatticeNormalProcess(
+                            name, checkers, normalProcesses);
+                    npStub = (NormalProcess) UnicastRemoteObject.exportObject(
+                            scpNP, 0);
+                    action = scpNP;
                     break;
-                    
+
                 case OGA:
-                    
+
                     break;
                 case LP:
-                    
+
                     break;
                 case CADA:
-                    
+
+                    break;
+                case SEQUENCE:
+                    SequenceLatticeNormalProcess sequenceNP = new SequenceLatticeNormalProcess(
+                            name, checkers, normalProcesses);
+                    npStub = (NormalProcess) UnicastRemoteObject.exportObject(
+                            sequenceNP, 0);
+                    action = sequenceNP;
                     break;
                 default:
-                    System.out.println("Type " + g.getType() + " has not been defined.");
+                    System.out.println("Type " + g.getType()
+                            + " has not been defined.");
                 }
             }
 
@@ -208,8 +218,7 @@ public class ECAManagerImp implements ECAManager {
                 System.out.println("local predicate includes:");
             }
             ArrayList<Atom> arrayList = localPredicate.getAtoms();
-            for(int i=0; i<arrayList.size(); i++)
-            {
+            for (int i = 0; i < arrayList.size(); i++) {
                 Atom atom = arrayList.get(i);
                 if (DEBUG) {
                     System.out.print(" " + atom.getName());
@@ -218,21 +227,23 @@ public class ECAManagerImp implements ECAManager {
             }
             if (DEBUG) {
                 System.out.println(".");
-                System.out.println("binding condition to data source successful.");
+                System.out
+                        .println("binding condition to data source successful.");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-        if(EXPERIMENT) {
+
+        if (EXPERIMENT) {
             timeInfo.item_1_end = System.nanoTime();
         }
-        
-        if(EXPERIMENT) {
+
+        if (EXPERIMENT) {
             try {
-                PrintWriter out = new PrintWriter(new FileWriter("log/eca_time_cost", true), true);
+                PrintWriter out = new PrintWriter(new FileWriter(
+                        "log/eca_time_cost", true), true);
                 out.println((timeInfo.item_1_end - timeInfo.item_1_begin));
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -251,9 +262,8 @@ public class ECAManagerImp implements ECAManager {
         try {
             for (int i = 0; i < resources.size(); i++) {
                 SensorAgent resource = resources.get(i);
-                broker.registerResource(resource.getName(),
-                                                 resource.getValueType(),
-                                                 ecaManagerName);
+                broker.registerResource(resource.getName(), resource
+                        .getValueType(), ecaManagerName);
             }
         } catch (Exception e) {
             e.printStackTrace();

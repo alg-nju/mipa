@@ -19,6 +19,9 @@
  */
 package net.sourceforge.mipa.predicatedetection;
 import static config.Debug.DEBUG;
+
+import java.util.HashMap;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,7 +32,7 @@ import org.w3c.dom.NodeList;
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
 public class StructureParser {
-
+    HashMap<String,Structure> nameToCGS = new HashMap<String, Structure>();
     /** context mapping */
     // private ContextModeling contextMapping;
 
@@ -51,10 +54,106 @@ public class StructureParser {
      *            a document
      */
     public Structure parseStructure(Document predicate) {
-        Structure result = null;
+        Structure result = new Composite(NodeType.SPECIFICATION,"specification");
+        if(DEBUG){
+            System.out.println("========================================");
+            System.out.println("Parsing predicate:");
+        }
+        NodeList elements = predicate.getElementsByTagName("CGSs");
+        if(DEBUG){
+            System.out.println("--CGSs");
+        }
+        if (elements != null) {
+            for (int i = 0; i < elements.getLength(); i++) {
+                Node CGSs = elements.item(i);
+                Structure CGSsNode = new Composite(NodeType.CGSs,"CGSs");
+                result.add(CGSsNode);
+                for (Node node = CGSs.getFirstChild(); 
+                      node != null; 
+                      node = node.getNextSibling()) {
 
-        NodeList elements = predicate.getElementsByTagName("GSE");
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
 
+                        if (node.getNodeName().equals("CGS")) {
+                            String name = node.getAttributes().getNamedItem("name").getNodeValue();
+                            if(DEBUG){
+                                System.out.println("----CGS:"+name);
+                            }
+                            Structure CGSNode = new Composite(NodeType.CGS,
+                                                              name);
+                            if(!nameToCGS.containsKey(name)) {
+                                nameToCGS.put(name, CGSNode);
+                                CGSsNode.add(CGSNode);
+                            }
+                            else {
+                                if(DEBUG){
+                                    System.out.println("Parse error: A CGS with the same name already exists:"+name);
+                                }
+                            }
+                            for (Node LP = node.getFirstChild(); 
+                                  LP != null; 
+                                  LP = LP.getNextSibling()) {
+                                
+                                if (LP.getNodeType() == Node.ELEMENT_NODE) {
+
+                                    if (LP.getNodeName().equals("LP"))
+                                        CGSNode.add(parseLocalPredicate(LP));
+                                } // :end if
+                            } // :end for
+                        } // :end if
+                    } // :end if
+                } // :end for
+            } // :end for
+        }
+        
+        elements = predicate.getElementsByTagName("specification");
+        if (elements != null) {
+            if(DEBUG){
+                System.out.println("--specification");
+            } 
+            Node specification = elements.item(0);
+            Node node = specification.getFirstChild(); 
+            node = node.getNextSibling();
+            String prefix = node.getAttributes().getNamedItem("value").getNodeValue();
+            if(DEBUG){
+                System.out.println("----prefix: "+prefix);
+            }
+            node = node.getNextSibling();
+            node = node.getNextSibling();
+            if(node.getNodeType() == Node.ELEMENT_NODE) {
+                if (node.getNodeName().equals("GSE")) {
+                    Structure GSENode = new Composite(NodeType.GSE, "GSE");
+                    result.add(GSENode);
+                    if(DEBUG){
+                        System.out.println("----GSE");
+                    }
+                    for (Node element = node.getFirstChild(); 
+                    element != null; 
+                    element = element.getNextSibling()) {
+                        if (element.getNodeType() == Node.ELEMENT_NODE) {
+                            if (element.getNodeName().equals("element")) {
+                                Structure elementNode = parseElement(element);
+                                GSENode.add(elementNode);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(DEBUG){
+            System.out.println("Parsing predicate over");
+            System.out.println("----------------------------------------");
+            System.out.println();
+        }
+        return result;
+        
+            
+            
+        /*    
+        PredicateType type = PredicateIdentify.predicateIdentify(predicate);
+        if(!type.equals(PredicateType.SEQUENCE)) {
+            
+        elements = predicate.getElementsByTagName("GSE");
         if (elements != null) {
             result = new Composite(NodeType.GSE, "GSE");
             if(DEBUG){
@@ -92,9 +191,113 @@ public class StructureParser {
                 } // :end for
             } // :end for
         } // :end if
-        return result;
+        }
+        */
     }
     
+    private Structure parseElement(Node element) {
+        // TODO Auto-generated method stub
+        if(DEBUG){
+            System.out.println("--------ELEMENT");
+        }
+        for (Node node = element.getFirstChild(); 
+        node != null; 
+        node = node.getNextSibling()) {
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                if (node.getNodeName().equals("zeroOrMore")) {
+                    if(DEBUG){
+                        System.out.println("------------ZEROORMORE");
+                    }
+                    Connector zeroOrMore = new Connector(NodeType.ZEROORMORE,"zeroOrMore");
+                    zeroOrMore.setOperator(NodeType.ZEROORMORE);
+                    for (Node subElement = node.getFirstChild(); 
+                    subElement != null; 
+                    subElement = subElement.getNextSibling()) {
+                        if (subElement.getNodeType() == Node.ELEMENT_NODE) {
+                            if (subElement.getNodeName().equals("element")) {
+                                System.out.print("--------");
+                                Structure elementNode = parseElement(subElement);
+                                zeroOrMore.add(elementNode);
+                            }
+                        }
+                    }
+                    return zeroOrMore;
+                }
+                else if (node.getNodeName().equals("oneOrMore")) {
+                    if(DEBUG){
+                        System.out.println("------------ONEORMORE");
+                    }
+                    Connector oneOrMore = new Connector(NodeType.ONEORMORE,"oneOrMore");
+                    oneOrMore.setOperator(NodeType.ONEORMORE);
+                    for (Node subElement = node.getFirstChild(); 
+                    subElement != null; 
+                    subElement = subElement.getNextSibling()) {
+                        if (subElement.getNodeType() == Node.ELEMENT_NODE) {
+                            if (subElement.getNodeName().equals("element")) {
+                                System.out.print("--------");
+                                Structure elementNode = parseElement(subElement);
+                                oneOrMore.add(elementNode);
+                            }
+                        }
+                    }
+                    return oneOrMore;
+                }
+                else if (node.getNodeName().equals("choice")) {
+                    if(DEBUG){
+                        System.out.println("------------CHOICE");
+                    }
+                    Connector choice = new Connector(NodeType.CHOICE,"choice");
+                    choice.setOperator(NodeType.CHOICE);
+                    for (Node subElement = node.getFirstChild(); 
+                    subElement != null; 
+                    subElement = subElement.getNextSibling()) {
+                        if (subElement.getNodeType() == Node.ELEMENT_NODE) {
+                            if (subElement.getNodeName().equals("element")) {
+                                System.out.print("--------");
+                                Structure elementNode = parseElement(subElement);
+                                choice.add(elementNode);
+                            }
+                        }
+                    }
+                    return choice;
+                }
+                else if (node.getNodeName().equals("optional")) {
+                    if(DEBUG){
+                        System.out.println("------------OPTIONAL");
+                    }
+                    Connector optional = new Connector(NodeType.OPTIONAL,"optional");
+                    optional.setOperator(NodeType.OPTIONAL);
+                    for (Node subElement = node.getFirstChild(); 
+                    subElement != null; 
+                    subElement = subElement.getNextSibling()) {
+                        if (subElement.getNodeType() == Node.ELEMENT_NODE) {
+                            if (subElement.getNodeName().equals("element")) {
+                                System.out.print("--------");
+                                Structure elementNode = parseElement(subElement);
+                                optional.add(elementNode);
+                            }
+                        }
+                    }
+                    return optional;
+                }
+                else if (node.getNodeName().equals("cgs")) {
+                    String name = node.getAttributes().getNamedItem("name").getNodeValue();
+                    Structure CGS = nameToCGS.get(name);
+                    if(DEBUG){
+                        System.out.println("--------------------CGS:"+name);
+                    }
+                    return CGS;
+                }
+                else {
+                    if(DEBUG){
+                        System.out.println("Parse error: incorrect element:"+node.getNodeName());
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public LocalPredicate parseLocalPredicate(Node localPredicate) {
         LocalPredicate LP = new LocalPredicate();
         if(DEBUG){

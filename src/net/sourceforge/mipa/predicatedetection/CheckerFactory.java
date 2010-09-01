@@ -29,6 +29,7 @@ import net.sourceforge.mipa.components.Communication;
 import net.sourceforge.mipa.components.MIPAResource;
 import net.sourceforge.mipa.naming.Naming;
 import net.sourceforge.mipa.predicatedetection.lattice.scp.SCPLatticeChecker;
+import net.sourceforge.mipa.predicatedetection.lattice.sequence.SequenceLatticeChecker;
 import net.sourceforge.mipa.predicatedetection.normal.cada.CADAChecker;
 import net.sourceforge.mipa.predicatedetection.lattice.wcp.WCPLatticeChecker;
 import net.sourceforge.mipa.predicatedetection.normal.oga.OGASubChecker;
@@ -53,33 +54,26 @@ public class CheckerFactory {
 
     /**
      * 
-     * @param level the level of checker in OGA, 0 represents top.
+     * @param level
+     *            the level of checker in OGA, 0 represents top.
      */
-    public static void createOGAChecker(String callback, 
-                                     String checkerName,
-                                     String[] fathers, 
-                                     String[] children, 
-                                     int level) {
+    public static void createOGAChecker(String callback, String checkerName,
+            String[] fathers, String[] children, int level) {
         try {
             ResultCallback application = null;
             if (level == 0) {
                 application = (ResultCallback) server.lookup(callback);
                 OGATopChecker checker = new OGATopChecker(application,
-                                                          checkerName, children);
-                Communication checkerStub 
-                                    = (Communication) UnicastRemoteObject
-                                                            .exportObject(checker,
-                                                                           0);
+                        checkerName, children);
+                Communication checkerStub = (Communication) UnicastRemoteObject
+                        .exportObject(checker, 0);
                 server.bind(checkerName, checkerStub);
 
             } else if (level == 1) {
                 OGASubChecker checker = new OGASubChecker(application,
-                                                          checkerName, fathers,
-                                                          children);
-                Communication checkerStub 
-                                    = (Communication) UnicastRemoteObject
-                                                            .exportObject(checker,
-                                                                           0);
+                        checkerName, fathers, children);
+                Communication checkerStub = (Communication) UnicastRemoteObject
+                        .exportObject(checker, 0);
                 server.bind(checkerName, checkerStub);
 
             } else {
@@ -92,80 +86,75 @@ public class CheckerFactory {
     }
 
     public static void createSCPChecker(String callback, String checkerName,
-                                        String[] normalProcesses) {
+            String[] normalProcesses) {
         try {
             ResultCallback application = (ResultCallback) server
-                                                    .lookup(callback);
+                    .lookup(callback);
 
             CheckMode checkMode = MIPAResource.getCheckMode();
-            if(checkMode == CheckMode.NORMAL) {
+            if (checkMode == CheckMode.NORMAL) {
                 // NORMAL mode code puts here!
                 SCPChecker checker = new SCPChecker(application, checkerName,
-                                                    normalProcesses);
-                Communication checkerStub 
-                                    = (Communication) UnicastRemoteObject
-                                                            .exportObject(checker,
-                                                                          0);
+                        normalProcesses);
+                Communication checkerStub = (Communication) UnicastRemoteObject
+                        .exportObject(checker, 0);
                 server.bind(checkerName, checkerStub);
                 if (DEBUG) {
                     System.out.println("binding checker " + checkerName);
                 }
-            } else if(checkMode == CheckMode.LATTICE) {
-            	SCPLatticeChecker checker = new SCPLatticeChecker(application, checkerName,
-				                        normalProcesses);
-				Communication checkerStub 
-				        = (Communication) UnicastRemoteObject
-				                                .exportObject(checker,
-				                                              0);
-				server.bind(checkerName, checkerStub);
-				if (DEBUG) {
-				System.out.println("binding checker " + checkerName);
-				}
-                
+            } else if (checkMode == CheckMode.LATTICE) {
+                SCPLatticeChecker checker = new SCPLatticeChecker(application,
+                        checkerName, normalProcesses);
+                Communication checkerStub = (Communication) UnicastRemoteObject
+                        .exportObject(checker, 0);
+                server.bind(checkerName, checkerStub);
+                if (DEBUG) {
+                    System.out.println("binding checker " + checkerName);
+                }
+
             } else {
-                System.out.println("Check Mode " + checkMode + "has not been defined.");
+                System.out.println("Check Mode " + checkMode
+                        + "has not been defined.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
     public static void createWCPChecker(String callback, String checkerName,
-                                        String[] normalProcesses) {
+            String[] normalProcesses) {
         try {
             ResultCallback application = (ResultCallback) server
-                                                                .lookup(callback);
-            
+                    .lookup(callback);
+
             CheckMode checkMode = MIPAResource.getCheckMode();
-            if(checkMode == CheckMode.NORMAL) {
+            if (checkMode == CheckMode.NORMAL) {
                 // NORMAL mode code puts here!
-                WCPChecker wcpChecker = new WCPChecker(application, checkerName,
-                                                        normalProcesses);
-                Communication wcpCheckerStub 
-                                        = (Communication) UnicastRemoteObject
-                                                                .exportObject(wcpChecker,
-                                                                               0);
+                WCPChecker wcpChecker = new WCPChecker(application,
+                        checkerName, normalProcesses);
+                Communication wcpCheckerStub = (Communication) UnicastRemoteObject
+                        .exportObject(wcpChecker, 0);
                 server.bind(checkerName, wcpCheckerStub);
                 if (DEBUG) {
                     System.out.println("binding checker " + checkerName);
                 }
-            } else if(checkMode == CheckMode.LATTICE) {
+            } else if (checkMode == CheckMode.LATTICE) {
                 // LATTICE mode code puts here!
-                WCPLatticeChecker wcpLatticeChecker = new WCPLatticeChecker(application, checkerName,
-                                                                                normalProcesses);
+                WCPLatticeChecker wcpLatticeChecker = new WCPLatticeChecker(
+                        application, checkerName, normalProcesses);
                 Communication wcpLatticecheckerStub = (Communication) UnicastRemoteObject
-                                                                                      .exportObject(wcpLatticeChecker,
-                                                                                                    0);
+                        .exportObject(wcpLatticeChecker, 0);
                 server.bind(checkerName, wcpLatticecheckerStub);
             } else {
-                System.out.println("Check Mode " + checkMode + "has not been defined.");
+                System.out.println("Check Mode " + checkMode
+                        + "has not been defined.");
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
 
     public static void createCADAChecker(String callback, String checkerName,
@@ -173,102 +162,89 @@ public class CheckerFactory {
         // TODO Auto-generated method stub
         try {
             ResultCallback application = (ResultCallback) server
-                                                    .lookup(callback);
+                    .lookup(callback);
 
             CheckMode checkMode = MIPAResource.getCheckMode();
-            if(checkMode == CheckMode.NORMAL) {
+            if (checkMode == CheckMode.NORMAL) {
                 // NORMAL mode code puts here!
                 CADAChecker checker = new CADAChecker(application, checkerName,
-                                                    normalProcesses);
-                Communication checkerStub 
-                                    = (Communication) UnicastRemoteObject
-                                                            .exportObject(checker,
-                                                                          0);
+                        normalProcesses);
+                Communication checkerStub = (Communication) UnicastRemoteObject
+                        .exportObject(checker, 0);
                 server.bind(checkerName, checkerStub);
                 if (DEBUG) {
                     System.out.println("binding checker " + checkerName);
                 }
-            } else if(checkMode == CheckMode.LATTICE) {
-                
-                
+            } else if (checkMode == CheckMode.LATTICE) {
+
             } else {
-                System.out.println("Check Mode " + checkMode + "has not been defined.");
+                System.out.println("Check Mode " + checkMode
+                        + "has not been defined.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    /*
-    public static void newChecker(String callback, String checkerName,
-                                  String[] normalProcesses,
-                                  PredicateType type) {
+
+    public static void createSequenceChecker(String callback,
+            String checkerName, String[] normalProcesses, Structure specification) {
+        // TODO Auto-generated method stub
         try {
             ResultCallback application = (ResultCallback) server
-                                                                .lookup(callback);
-            
-            CheckMode checkMode = MIPAResource.getCheckMode();
-            if(checkMode == CheckMode.NORMAL) {
-                // NORMAL mode code puts here!
-                switch (type) {
-                case SCP:
-                    SCPChecker checker = new SCPChecker(application, checkerName,
-                                                        normalProcesses);
-                    Communication checkerStub 
-                                        = (Communication) UnicastRemoteObject
-                                                                .exportObject(checker,
-                                                                               0);
-                    server.bind(checkerName, checkerStub);
-                    if (DEBUG) {
-                        System.out.println("binding checker " + checkerName);
-                    }
-                    break;
-                case LP:
+                    .lookup(callback);
 
-                    break;
-                case WCP:
-                    WCPChecker wcpChecker = new WCPChecker(application, checkerName,
-                                                        normalProcesses);
-                    Communication wcpCheckerStub 
-                                        = (Communication) UnicastRemoteObject
-                                                                .exportObject(wcpChecker,
-                                                                               0);
-                    server.bind(checkerName, wcpCheckerStub);
-                    if (DEBUG) {
-                        System.out.println("binding checker " + checkerName);
-                    }
-                    break;
-                default:
-                    System.out.println("Type " + type + " has not been defined.");
-                }
-            } else if(checkMode == CheckMode.LATTICE) {
-                // LATTICE mode code puts here!
-                switch(type) {
-                case WCP:
-                    WCPLatticeChecker wcpLatticeChecker = new WCPLatticeChecker(application, checkerName,
-                                                                                normalProcesses);
-                    Communication wcpLatticecheckerStub = (Communication) UnicastRemoteObject
-                                                                                        .exportObject(wcpLatticeChecker,
-                                                                                                        0);
-                    server.bind(checkerName, wcpLatticecheckerStub);
-                    break;
-                case SCP:
-                    
-                    break;
-                case LP:
-                    
-                    break;
-                default:
-                    System.out.println("Type " + type + " has not been defined.");
-                }
+            CheckMode checkMode = MIPAResource.getCheckMode();
+            if (checkMode == CheckMode.NORMAL) {
+                // NORMAL mode code puts here!
+            } else if (checkMode == CheckMode.LATTICE) {
+                SequenceLatticeChecker sequenceLatticeChecker = new SequenceLatticeChecker(
+                        application, checkerName, normalProcesses,specification);
+                Communication sequenceLatticecheckerStub = (Communication) UnicastRemoteObject
+                        .exportObject(sequenceLatticeChecker, 0);
+                server.bind(checkerName, sequenceLatticecheckerStub);
             } else {
-                System.out.println("Check Mode " + checkMode + "has not been defined.");
+                System.out.println("Check Mode " + checkMode
+                        + "has not been defined.");
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    */
+
+    /*
+     * public static void newChecker(String callback, String checkerName,
+     * String[] normalProcesses, PredicateType type) { try { ResultCallback
+     * application = (ResultCallback) server .lookup(callback);
+     * 
+     * CheckMode checkMode = MIPAResource.getCheckMode(); if(checkMode ==
+     * CheckMode.NORMAL) { // NORMAL mode code puts here! switch (type) { case
+     * SCP: SCPChecker checker = new SCPChecker(application, checkerName,
+     * normalProcesses); Communication checkerStub = (Communication)
+     * UnicastRemoteObject .exportObject(checker, 0); server.bind(checkerName,
+     * checkerStub); if (DEBUG) { System.out.println("binding checker " +
+     * checkerName); } break; case LP:
+     * 
+     * break; case WCP: WCPChecker wcpChecker = new WCPChecker(application,
+     * checkerName, normalProcesses); Communication wcpCheckerStub =
+     * (Communication) UnicastRemoteObject .exportObject(wcpChecker, 0);
+     * server.bind(checkerName, wcpCheckerStub); if (DEBUG) {
+     * System.out.println("binding checker " + checkerName); } break; default:
+     * System.out.println("Type " + type + " has not been defined."); } } else
+     * if(checkMode == CheckMode.LATTICE) { // LATTICE mode code puts here!
+     * switch(type) { case WCP: WCPLatticeChecker wcpLatticeChecker = new
+     * WCPLatticeChecker(application, checkerName, normalProcesses);
+     * Communication wcpLatticecheckerStub = (Communication) UnicastRemoteObject
+     * .exportObject(wcpLatticeChecker, 0); server.bind(checkerName,
+     * wcpLatticecheckerStub); break; case SCP:
+     * 
+     * break; case LP:
+     * 
+     * break; default: System.out.println("Type " + type +
+     * " has not been defined."); } } else { System.out.println("Check Mode " +
+     * checkMode + "has not been defined."); }
+     * 
+     * } catch (Exception e) { e.printStackTrace(); } }
+     */
 }

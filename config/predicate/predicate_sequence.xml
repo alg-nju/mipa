@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE predicate SYSTEM "predicate.dtd">
+<predicate type="SEQUENCE">
+	<CGSs>
+		<CGS name="a" value="conjunction">
+			<LP>
+				<formula>
+					<atom operator="great-than" name="light" value="500" />
+				</formula>
+			</LP>
+			<LP>
+				<formula>
+					<atom operator="contain" name="RFID" value="tag_00001" />
+				</formula>
+			</LP>
+		</CGS>
+		<CGS name="b" value="conjunction">
+			<LP>
+				<formula>
+					<atom operator="less-than" name="light_1" value="500" />
+				</formula>
+			</LP>
+			<LP>
+				<formula>
+					<atom operator="not-contain" name="RFID_1" value="tag_00001" />
+				</formula>
+			</LP>
+		</CGS>
+	</CGSs>
+	<specification>
+		<prefix value="pos" />
+		<GSE value="conjunction">
+			<element>
+				<oneOrMore>
+					<element>
+						<cgs name="a"/>
+					</element>
+				</oneOrMore>
+			</element>
+			<element>
+				<cgs name="b"/>
+			</element>
+			<global>g</global>
+  		</GSE>
+	</specification>
+</predicate>

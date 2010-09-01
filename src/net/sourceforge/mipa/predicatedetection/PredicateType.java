@@ -25,5 +25,5 @@ package net.sourceforge.mipa.predicatedetection;
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
 public enum PredicateType {
-    WCP, SCP, LP, OGA, CADA
+    WCP, SCP, LP, OGA, CADA, SEQUENCE
 }

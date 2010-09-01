@@ -32,10 +32,17 @@ public enum NodeType {
     QUANTIFIER,
     BINARY,
     UNARY,
+    POLONARY,
     UNIVERSAL,
     EXISTENTIAL,
     NOT,
     CONJUNCTION,
     DISJUNCTION,
-    IMPLY    
+    IMPLY,
+    SPECIFICATION,
+    CGSs,
+    ZEROORMORE,
+    ONEORMORE,
+    CHOICE,
+    OPTIONAL
 }

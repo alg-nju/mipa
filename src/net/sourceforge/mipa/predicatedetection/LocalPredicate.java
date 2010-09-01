@@ -34,6 +34,7 @@ public class LocalPredicate implements Structure,Serializable {
     /** atoms that local predicate related */
     private ArrayList<Atom> atoms;
     
+    private String normalProcess;
     //private String connection;
     
     private ArrayList<Structure> formula;
@@ -48,6 +49,14 @@ public class LocalPredicate implements Structure,Serializable {
             if(name.equals(atoms.get(i))) return atoms.get(i);
         }
         return null;
+    }
+
+    public String getNormalProcess() {
+        return normalProcess;
+    }
+
+    public void setNormalProcess(String normalProcess) {
+        this.normalProcess = normalProcess;
     }
 
     /**

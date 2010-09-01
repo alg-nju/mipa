@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE predicate SYSTEM "predicate.dtd">
 <predicate type="SCP">
-  <prefix value="def" />
-  <GSE value="conjunction">
-    <CGS value="conjunction">
-      <LP>
-	<formula>
-	<atom operator="great-than" name="light" value="500" />
-	</formula>
-      </LP>
-      <LP>
-	<formula>
-	  <atom operator="not-contain" name="RFID" value="tag_00001" />
-	</formula>
-      </LP>
-    </CGS>
-    <global>g</global>
-  </GSE>
+	<CGSs>
+		<CGS name = "a" value = "conjunction">
+			<LP>
+				<formula>
+					<atom operator="great-than" name="light" value="500" />
+				</formula>
+			</LP>
+			<LP>
+				<formula>
+					<atom operator="not-contain" name="RFID" value="tag_00001" />
+				</formula>
+			</LP>
+		</CGS>
+	</CGSs>
+	<specification>
+		<prefix value="def" />
+		<GSE value="conjunction">
+			<element>
+				<cgs name = "a"/>
+			</element>
+			<global>g</global>
+		</GSE>
+	</specification>
 </predicate>

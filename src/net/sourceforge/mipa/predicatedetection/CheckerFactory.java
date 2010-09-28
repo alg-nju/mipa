@@ -30,6 +30,7 @@ import net.sourceforge.mipa.components.MIPAResource;
 import net.sourceforge.mipa.naming.Naming;
 import net.sourceforge.mipa.predicatedetection.lattice.scp.SCPLatticeChecker;
 import net.sourceforge.mipa.predicatedetection.lattice.sequence.SequenceLatticeChecker;
+import net.sourceforge.mipa.predicatedetection.lattice.simplesequence.SimpleSequenceLatticeChecker;
 import net.sourceforge.mipa.predicatedetection.normal.cada.CADAChecker;
 import net.sourceforge.mipa.predicatedetection.lattice.wcp.WCPLatticeChecker;
 import net.sourceforge.mipa.predicatedetection.normal.oga.OGASubChecker;
@@ -203,6 +204,32 @@ public class CheckerFactory {
                 Communication sequenceLatticecheckerStub = (Communication) UnicastRemoteObject
                         .exportObject(sequenceLatticeChecker, 0);
                 server.bind(checkerName, sequenceLatticecheckerStub);
+            } else {
+                System.out.println("Check Mode " + checkMode
+                        + "has not been defined.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void createSimpleSequenceChecker(String callback,
+            String checkerName, String[] normalProcesses, Structure specification) {
+        // TODO Auto-generated method stub
+        try {
+            ResultCallback application = (ResultCallback) server
+                    .lookup(callback);
+
+            CheckMode checkMode = MIPAResource.getCheckMode();
+            if (checkMode == CheckMode.NORMAL) {
+                // NORMAL mode code puts here!
+            } else if (checkMode == CheckMode.LATTICE) {
+                SimpleSequenceLatticeChecker simplesequenceLatticeChecker = new SimpleSequenceLatticeChecker(
+                        application, checkerName, normalProcesses,specification);
+                Communication simplesequenceLatticecheckerStub = (Communication) UnicastRemoteObject
+                        .exportObject(simplesequenceLatticeChecker, 0);
+                server.bind(checkerName, simplesequenceLatticecheckerStub);
             } else {
                 System.out.println("Check Mode " + checkMode
                         + "has not been defined.");

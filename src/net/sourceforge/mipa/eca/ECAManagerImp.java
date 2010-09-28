@@ -39,6 +39,7 @@ import net.sourceforge.mipa.predicatedetection.LocalPredicate;
 import net.sourceforge.mipa.predicatedetection.NormalProcess;
 import net.sourceforge.mipa.predicatedetection.lattice.scp.SCPLatticeNormalProcess;
 import net.sourceforge.mipa.predicatedetection.lattice.sequence.SequenceLatticeNormalProcess;
+import net.sourceforge.mipa.predicatedetection.lattice.simplesequence.SimpleSequenceLatticeNormalProcess;
 import net.sourceforge.mipa.predicatedetection.lattice.wcp.WCPLatticeNormalProcess;
 import net.sourceforge.mipa.predicatedetection.normal.cada.CADANormalProcess;
 import net.sourceforge.mipa.predicatedetection.normal.oga.OGANormalProcess;
@@ -163,6 +164,9 @@ public class ECAManagerImp implements ECAManager {
                 case SEQUENCE:
 
                     break;
+                case SIMPLESEQUENCE:
+
+                    break;
                 default:
                     System.out.println("Type " + g.getType()
                             + " has not been defined.");
@@ -200,6 +204,13 @@ public class ECAManagerImp implements ECAManager {
                     npStub = (NormalProcess) UnicastRemoteObject.exportObject(
                             sequenceNP, 0);
                     action = sequenceNP;
+                    break;
+                case SIMPLESEQUENCE:
+                	SimpleSequenceLatticeNormalProcess simplesequenceNP = 
+                		new SimpleSequenceLatticeNormalProcess(name, checkers, normalProcesses);
+                	npStub = (NormalProcess) UnicastRemoteObject.exportObject(
+                            simplesequenceNP, 0);
+                    action = simplesequenceNP;
                     break;
                 default:
                     System.out.println("Type " + g.getType()

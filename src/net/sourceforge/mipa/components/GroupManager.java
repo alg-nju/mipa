@@ -77,7 +77,7 @@ public class GroupManager {
         Structure CGSsNode = structure.get(0);
         Structure GSENode = structure.get(1);
         Structure groupNode;
-        if (predicateType.equals(PredicateType.SEQUENCE)) {
+        if (predicateType.equals(PredicateType.SEQUENCE)||predicateType.equals(PredicateType.SIMPLESEQUENCE)) {
             Structure GSE = new Composite(NodeType.GSE,"GSE");
             Structure CGS = new Composite(NodeType.CGS,"CGS");
             GSE.add(CGS);
@@ -270,13 +270,80 @@ public class GroupManager {
             allocateAsSequence(groups, groupToChecker,
                     localPredicateToNormalProcess, callback, maxLevel);
             break;
+        case SIMPLESEQUENCE:
+            allocateAsSimpleSequence(groups, groupToChecker,
+                    localPredicateToNormalProcess, callback, maxLevel);
+            break;
         default:
             System.out
                     .println("This predicate type have not been implemented yet.");
         }
     }
 
-    private void allocateAsSequence(Map<String, AbstractGroup> groups,
+    private void allocateAsSimpleSequence(Map<String, AbstractGroup> groups,
+			Map<String, String> groupToChecker,
+			Map<LocalPredicate, String> localPredicateToNormalProcess,
+			String callback, int maxLevel) {
+		
+    	IDManager idManager = MIPAResource.getIDManager();
+        Coordinator coordinator = MIPAResource.getCoordinator();
+
+        // start checker for level > 0
+        for (int i = maxLevel; i > 0; i--) {
+
+        }
+
+        // check the level == 0
+        for (String s : groups.keySet()) {
+            AbstractGroup g = groups.get(s);
+            if (g.getLevel() == 0) {
+                String gid = g.getGroupId();
+
+                // current Implementation is that father of simple sequence checker is null;
+
+                ArrayList<Object> children = g.getChildren();
+                ArrayList<String> owners = new ArrayList<String>();
+                ArrayList<String> members = new ArrayList<String>();
+                owners.add(groupToChecker.get(gid));
+                for (int i = 0; i < children.size(); i++) {
+                    members.add(localPredicateToNormalProcess.get(children
+                            .get(i)));
+                }
+                // create group
+                String groupId = null;
+                try {
+                    groupId = idManager.getID(Catalog.Group);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                Group ng = new Group(groupId, owners, members,
+                        PredicateType.SIMPLESEQUENCE);
+                ng.setCoordinatorID(groupId);
+
+                try {
+                    coordinator.newCoordinator(ng);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                String checkerName = ng.getOwners().get(0);
+                String[] normalProcesses = new String[ng.getMembers().size()];
+                ng.getMembers().toArray(normalProcesses);
+                CheckerFactory.createSimpleSequenceChecker(callback, checkerName,
+                        normalProcesses, specification);
+
+                // create Normal Processes.
+                for (int i = 0; i < children.size(); i++) {
+                    broker.registerLocalPredicate((LocalPredicate) children
+                            .get(i), localPredicateToNormalProcess.get(children
+                            .get(i)), ng);
+                }
+            }
+        }
+	}
+
+	private void allocateAsSequence(Map<String, AbstractGroup> groups,
             Map<String, String> groupToChecker,
             Map<LocalPredicate, String> localPredicateToNormalProcess,
             String callback, int maxLevel) {

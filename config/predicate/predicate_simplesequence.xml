@@ -10,7 +10,7 @@
 			</LP>
 			<LP>
 				<formula>
-					<atom operator="contain" name="RFID" value="tag_00001" />
+					<atom operator="not-contain" name="RFID" value="tag_00001" />
 				</formula>
 			</LP>
 		</CGS>
@@ -22,7 +22,7 @@
 			</LP>
 			<LP>
 				<formula>
-					<atom operator="not-contain" name="RFID_1" value="tag_00001" />
+					<atom operator="contain" name="RFID_1" value="tag_00001" />
 				</formula>
 			</LP>
 		</CGS>

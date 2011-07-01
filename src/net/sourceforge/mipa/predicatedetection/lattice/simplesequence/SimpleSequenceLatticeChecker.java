@@ -40,7 +40,9 @@ public class SimpleSequenceLatticeChecker extends LatticeChecker {
 
 	private int count;
 
-	private PrintWriter out = null;
+	//private PrintWriter out = null;
+	
+	private PrintWriter result = null;
 
 	public SimpleSequenceLatticeChecker(ResultCallback application,
 			String checkerName, String[] normalProcesses,
@@ -60,7 +62,8 @@ public class SimpleSequenceLatticeChecker extends LatticeChecker {
 		getssPredicate(specification);
 		count = 0;
 		try {
-			out = new PrintWriter(LOG_DIRECTORY + "/simpleSequence.log");
+			//out = new PrintWriter(LOG_DIRECTORY + "/simpleSequence.log");
+			result = new PrintWriter(LOG_DIRECTORY + "/SSResult.log");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -187,7 +190,7 @@ public class SimpleSequenceLatticeChecker extends LatticeChecker {
 				}
 			}
 		}
-		out.println("level " + level + "+1 is " + flag);
+		//out.println("level " + level + "+1 is " + flag);
 		return flag;
 	}
 
@@ -248,16 +251,16 @@ public class SimpleSequenceLatticeChecker extends LatticeChecker {
 	private boolean getCGS(SimpleSequenceLatticeNode node, int number) {
 		boolean bool = true;
 		ArrayList<String> NPs = new ArrayList<String>();
-		// System.out.print(number);
-		// System.out.print(ssPredicate.get(number));
 
+		//System.out.print(ssPredicate.get(number)+" ");
 		NPs = CGSToNPs.get(ssPredicate.get(number));
 		for (int i = 0; i < NPs.size(); i++) {
 			String np = NPs.get(i);
 			String[] c = np.split("ss");
 			assert (c.length == 2);
 			int npIndex = Integer.valueOf(c[1]);
-			bool = bool && (getGlobalState()[npIndex].getlocalPredicate());
+			bool = bool && (node.getglobalState()[npIndex].getlocalPredicate());
+			//System.out.print(node.getglobalState()[npIndex].getintervalID()+" "+node.getglobalState()[npIndex].getlocalPredicate()+" ");
 		}
 		return bool;
 	}
@@ -266,17 +269,17 @@ public class SimpleSequenceLatticeChecker extends LatticeChecker {
 	public void check(AbstractLatticeNode startNode,
 			AbstractLatticeNode currentNode) {
 
-		out.print("currentNode: ");
+		/*.print("currentNode: ");
 		for (int j = 0; j < currentNode.getID().length; j++) {
 			out.print(currentNode.getID()[j] + " ");
 		}
-		out.println();
+		out.println();*/
 
 		// previous 初始化
 		if ((level == 0) && (previous.size() == 0)) {
 			previous.add((SimpleSequenceLatticeNode) startNode);
 			((SimpleSequenceLatticeNode) startNode).setprefix(-1);
-			out.println("level 0 initialized.");
+			//out.println("level 0 initialized.");
 		}
 
 		// check each full level
@@ -284,61 +287,58 @@ public class SimpleSequenceLatticeChecker extends LatticeChecker {
 		while (isfull(current, (SimpleSequenceLatticeNode) currentNode)) { // 若下一层长满，则进行SS检测
 			level++;
 
-			out.println("------------level " + level + "-----------");
+			//输出current集合，即当前层的节点
+			/*out.println("------------level " + level + "-----------");
 			for (int i = 0; i < current.size(); i++) {
 				for (int j = 0; j < current.get(i).getID().length; j++) {
 					out.print(current.get(i).getID()[j] + " ");
 				}
 				out.print("||");
 			}
-			out.println();
+			out.println();*/
 
 			// 对current集合中的每一个node计算prefix值，并判断是否满足SS
 			Iterator<SimpleSequenceLatticeNode> iter = current.iterator();
 			while (iter.hasNext()) {
 				SimpleSequenceLatticeNode node = iter.next();
-				for (int j = 0; j < node.getID().length; j++) {
-					out.print(node.getID()[j] + " ");
-				}
-				out.print("||");
+				
+				//for (int j = 0; j < node.getID().length; j++) {
+				//	out.print(node.getID()[j] + " ");
+				//}
+				//out.print("||");
+				
 				ArrayList<SimpleSequenceLatticeNode> pred = new ArrayList<SimpleSequenceLatticeNode>();
 				for (int i = 0; i < node.getprevious().size(); i++) {
 					pred.add((SimpleSequenceLatticeNode) node.getprevious()
 							.get(i));
 
-					for (int j = 0; j < node.getprevious().get(i).getID().length; j++) {
-						out.print(node.getprevious().get(i).getID()[j] + " ");
-					}
-					out.print("$$");
+					//for (int j = 0; j < node.getprevious().get(i).getID().length; j++) {
+					//	out.print(node.getprevious().get(i).getID()[j] + " ");
+					//}
+					//out.print("$$");
 
 				}
 				int u = getMinPrefix(pred);
-				out.print("minprefix " + u);
+				//out.print("minprefix " + u);
 
 				if (u < ssPredicate.size() - 1) {
 					if (getCGS(node, u + 1)) {
 						node.setprefix(u + 1);
-						if (DEBUG) {
-							out.print(" grow a step of predicate " + u + " ");
-						}
+						//out.print(" grow a step of predicate " + u + " ");
 					} else {
 						node.setprefix(u);
-						if (DEBUG) {
-							out.print(" unchanged!" + u + " ");
-						}
+						//out.print(" unchanged!" + u + " ");
 					}
 				} else {
 					node.setprefix(u);
-					if (DEBUG) {
-						out.print(" unchanged!!" + u + " ");
-					}
+					//out.print(" unchanged!!" + u + " ");
 				}
 
 				if (node.getprefix() == ssPredicate.size() - 1) {
 					node.setverified(true);
 				}
 
-				out.println(" node's prefix" + node.getprefix() + " ");
+				//out.println(" node's prefix" + node.getprefix() + " ");
 			}
 
 			Iterator<SimpleSequenceLatticeNode> it_current = current.iterator();
@@ -360,13 +360,29 @@ public class SimpleSequenceLatticeChecker extends LatticeChecker {
 
 				count++;
 				System.out.println(count + "  SimpleSequence");
-				out.println("<<<<<<<<<<<<<<<<<  " + count
-						+ " simple sequence  >>>>>>>>>>>>>>>>>>>>");
+				//out.println("<<<<<<<<<<<<<<<<<  " + count + " simple sequence  >>>>>>>>>>>>>>>>>>>>");
+				
+				result.print("No. "+  count +",");
+				Iterator<SimpleSequenceLatticeNode> iter_current = current.iterator();
+				for (int i = 0; i < current.size(); i++) {
+					SimpleSequenceLatticeNode ssnode = iter_current.next();
+					LocalState[] gs = ssnode.getglobalState();
+					result.print("( ");
+					for (int j = 0; j < gs.length; j++) {
+						
+						String end = j + 1 != children.length ? " " : " ),";
+						result.print(gs[j].getintervalID() + end);
+						result.flush();
+					}
+				}
+				result.println(" level: " + level);
+				
 			}
 
 			previous = current;
 			current = getsucceed();
-			out.flush();
+			//out.flush();
+			result.flush();
 		}
 
 	}

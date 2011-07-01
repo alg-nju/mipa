@@ -14,7 +14,7 @@ public class SimpleSequenceLatticeNode extends AbstractLatticeNode {
 		verified = false;
 	}
 
-	public int getLevel() {
+	/*public int getLevel() {
 		int level = Integer.valueOf(ID[0]).intValue();
 		for (int i = 1; i < ID.length; i++) {
 			int le = Integer.valueOf(ID[i]).intValue();
@@ -23,7 +23,7 @@ public class SimpleSequenceLatticeNode extends AbstractLatticeNode {
 			}
 		}
 		return level;
-	}
+	}*/
 
 	public void setprefix(int prefix) {
 		this.prefix = prefix;

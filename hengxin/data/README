@@ -8,7 +8,7 @@ temperature sensor data per line by following.
 * RFID data source format:
 
 first line: time gap.
-sencond line: the number of tags.
+second line: the number of tags.
 tags id per line by following.
 tags data per line by following as the order of tags id.
 

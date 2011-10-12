@@ -1,0 +1,6 @@
+digraph Predicate {
+"a" -> "[light great-than 500]";
+"b" -> "[RFID_1 not-contain tag_00001]";
+"A(a U b)" -> "a";
+"A(a U b)" -> "b";
+}

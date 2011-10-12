@@ -44,5 +44,18 @@ public enum NodeType {
     ZEROORMORE,
     ONEORMORE,
     CHOICE,
-    OPTIONAL
+    OPTIONAL,
+    
+	/**
+	 * CTL related node types are added by @author hengxin(hengxin0912@gmail.com)
+	 */
+    CTLFORMULA,
+    EX,
+    EU,
+    EF,
+    EG,
+    AX,
+    AU,
+    AF,
+    AG
 }

@@ -119,4 +119,10 @@ public class Composite implements Structure,Serializable {
     public void setLastValue(boolean lastValue) {
         this.lastValue = lastValue;
     }
+    
+    @Override
+    public String toString()
+    {
+    	return this.nodeName;
+    }
 }

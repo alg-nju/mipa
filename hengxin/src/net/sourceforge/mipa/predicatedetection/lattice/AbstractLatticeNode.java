@@ -20,13 +20,18 @@
 package net.sourceforge.mipa.predicatedetection.lattice;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * 
  * @author tingting Hua<huatingting0820@gmail.com>
- * 
+ *
+ * extends SerialCloneable
+ * modified by hengxin(hengxin0912@gmail.com)
  */
-public abstract class AbstractLatticeNode {
+public abstract class AbstractLatticeNode /* extends SerialCloneable */{
+
+	private static final long serialVersionUID = 3898874491584424406L;
 
 	// label the node, not necessary.
 	protected String[] ID;
@@ -51,6 +56,18 @@ public abstract class AbstractLatticeNode {
 		return ID;
 	}
 
+	public String getIDLiteral()
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		for(String localId : ID)
+		{
+			sb.append(localId).append('_');
+		}
+		
+		return sb.toString();
+	}
+	
 	public LocalState[] getglobalState() {
 		return globalState;
 	}
@@ -63,4 +80,12 @@ public abstract class AbstractLatticeNode {
 		return previous;
 	}
 
+	/**
+	 * added by hengxin(hengxin0912@gmail.com)
+	 */
+	@Override
+	public String toString()
+	{
+		return Arrays.toString(this.ID);
+	}
 }

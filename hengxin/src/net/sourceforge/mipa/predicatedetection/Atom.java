@@ -239,4 +239,10 @@ public class Atom extends Composite {
         return true;
     }
     */
+    
+    @Override
+    public String toString()
+    {
+    	return name + "\t" + operator + "\t" + value; 
+    }
 }

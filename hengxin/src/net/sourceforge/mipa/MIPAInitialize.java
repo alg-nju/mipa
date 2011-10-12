@@ -103,7 +103,7 @@ public class MIPAInitialize {
             */
             
             //RandomDelayMessageDispatcher messageDispatcher = new RandomDelayMessageDispatcher();
-            //NoDelayMessageDispatcher messageDispatcher = new NoDelayMessageDispatcher();
+//            NoDelayMessageDispatcher messageDispatcher = new NoDelayMessageDispatcher();
             ExponentDelayMessageDispatcher messageDispatcher = new ExponentDelayMessageDispatcher();
             
             MessageDispatcher messageDispatcherStub 

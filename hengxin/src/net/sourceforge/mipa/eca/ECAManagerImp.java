@@ -204,7 +204,7 @@ public class ECAManagerImp implements ECAManager {
                     action = cadaNP;
                     break;
                 case SEQUENCE:
-
+                case CTL:
                     break;
                 default:
                     System.out.println("Type " + g.getType()
@@ -238,6 +238,8 @@ public class ECAManagerImp implements ECAManager {
 
                     break;
                 case SEQUENCE:
+                	//FIXME: register local predicate for CTL 
+                case CTL:
                     SequenceLatticeNormalProcess sequenceNP = new SequenceLatticeNormalProcess(
                             name, checkers, normalProcesses);
                     npStub = (NormalProcess) UnicastRemoteObject.exportObject(

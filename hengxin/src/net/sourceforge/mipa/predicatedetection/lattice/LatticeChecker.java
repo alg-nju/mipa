@@ -28,13 +28,15 @@ import java.util.Iterator;
 import net.sourceforge.mipa.application.ResultCallback;
 import net.sourceforge.mipa.components.Message;
 import net.sourceforge.mipa.predicatedetection.AbstractFIFOChecker;
+import net.sourceforge.mipa.predicatedetection.lattice.ctl.data.CheckerInfo;
+import net.sourceforge.mipa.ui.lattice.LatticeDot;
 
 /**
  * 
  * @author tingting Hua<huatingting0820@gmail.com>
  * 
  */
-public abstract class LatticeChecker extends AbstractFIFOChecker {
+public abstract class LatticeChecker extends AbstractFIFOChecker implements ILatticeConstructor {
 
 	private static final long serialVersionUID = 1230192910873066775L;
 
@@ -57,9 +59,16 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 
 	private boolean[] interNumFlag;
 
+	/**
+	 * added by hengxin(hengxin0912@gmail.com)
+	 * 
+	 * store the lattice nodes in Hashtable in addition to tree view 
+	 */
+//	protected Hashtable<String,AbstractLatticeNode> nodeTable = new Hashtable<String,AbstractLatticeNode>();
+	
 	/** output the lattice constructor procedure information */
 	private PrintWriter out = null;
-
+	
 	public LatticeChecker(ResultCallback application, String predicateID, String checkerName,
 			String[] normalProcesses) {
 
@@ -89,6 +98,10 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 		}
 
 		startNode = createNode(globalState, s);
+		
+		// store the start node in the hash table
+		CheckerInfo.getInstance().storeNode2Table(startNode);
+		
 		currentNode = startNode;
 
 		try {
@@ -110,8 +123,8 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 					.getMessageContent();
 
 			// compute interval number of current process
-			if (content.getlocalPredicate() == true) {
-				if (interNumFlag[id] == true) {
+			if (content.getlocalPredicate()) {
+				if (interNumFlag[id]) {
 					interNumArray[id]++;
 					interNumFlag[id] = false;
 				}
@@ -223,9 +236,19 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 				}
 			}
 		}
+		
 		if (eq) {
 			return 0; // if node1=node2, return 0;
 		}
+		else
+		{
+			/**
+			 * debug by hengxin(hengxin0912@gmail.com)
+			 */
+			if(node1.getIDLiteral().equals(node2.getIDLiteral()))
+				System.out.println("Compare Error");
+		}
+		
 		if (firstneq && (position > -1)) {
 			firstneq = false;
 			for (int j = 0; j < stateSet.get(position).size() - 1; j++) {
@@ -260,6 +283,17 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 		AbstractLatticeNode node = createNode(globalState, str);
 		currentNode.next.add(node);
 		node.previous.add(currentNode);
+		
+		// store new node into the hash table
+		CheckerInfo.getInstance().storeNode2Table(node);
+		
+		if (CheckerInfo.DOT)
+		{
+			//output to .dot file
+			LatticeDot.getInstance().write2LatticeDotLink(currentNode, node,
+					true);
+		}
+		
 		currentNode = node;
 		LocalState[] cgs = new LocalState[globalState.length];
 		for (int i = 0; i < globalState.length; i++) {
@@ -289,42 +323,69 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 	 * @return
 	 */
 	private void dfs_construction(int pID, AbstractLatticeNode cur_node,
-			LocalState[] cgs) {
+			LocalState[] cgs)
+	{
 		// compute the cur_node's max_list
 		ArrayList<LocalState> max = new ArrayList<LocalState>();
-		for (int k = 0; k < dimension; k++) {
-			if (k != pID) {
+		for (int k = 0; k < dimension; k++)
+		{
+			if (k != pID)
+			{
 				int index = stateSet.get(k).indexOf(cgs[k]);
 				// if the process_k has state to roll back
-				if (index + 1 < stateSet.get(k).size()) {
+				if (index + 1 < stateSet.get(k).size())
+				{
 					boolean flag = true;
 					LocalState comps = stateSet.get(k).get(index + 1);
-					for (int j = 0; j < dimension; j++) {
-						if ((j != k) && (comps.vc.lessThan(cgs[j].vc))) {
+					for (int j = 0; j < dimension; j++)
+					{
+						if ((j != k) && (comps.vc.lessThan(cgs[j].vc)))
+						{
 							flag = false;
 						}
 					}
 					// if the state could roll back
-					if (flag) {
+					if (flag)
+					{
 						max.add(comps);
+					}
+					/**
+					 * added by hengxin(hengxin0912@gmail.com)
+					 * 
+					 * processing the non-lattice node explicitly if the state
+					 * cannot roll back
+					 */
+					else
+					{
+						// the corresponding state cannot roll back
+						int fail2RollPid = k;
+						int fail2RollIndex = index + 1;
+
+						this.handleNonNode(cur_node, fail2RollPid,
+								fail2RollIndex);
 					}
 				}
 			}
 		}
 		// for every state in max, create new node, recurse the procedure.
-		if (max.size() < 1) {
+		if (max.size() < 1)
+		{
 			return;
-		} else {
+		} else
+		{
 			Iterator<LocalState> iter = max.iterator();
-			while (iter.hasNext()) {
+			while (iter.hasNext())
+			{
 				LocalState s = iter.next();
 				LocalState[] gs = new LocalState[cgs.length];
-				for (int i = 0; i < cgs.length; i++) {
+				for (int i = 0; i < cgs.length; i++)
+				{
 					gs[i] = cgs[i];
 				}
 				gs[s.processID] = s;
 				String[] str = new String[dimension];
-				for (int j = 0; j < dimension; j++) {
+				for (int j = 0; j < dimension; j++)
+				{
 					int temp = stateSet.get(j).size()
 							- stateSet.get(j).indexOf(gs[j]) - 1;
 					str[j] = String.valueOf(temp);
@@ -334,39 +395,72 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 				ArrayList<AbstractLatticeNode> nodelist = cur_node.previous;
 				Iterator<AbstractLatticeNode> nodeiter = nodelist.iterator();
 				boolean bool = false;
-				while (nodeiter.hasNext()) {
+				while (nodeiter.hasNext())
+				{
 					AbstractLatticeNode lnode = nodeiter.next();
-					if (compare(lnode, newnode) == 0) {
+					if (compare(lnode, newnode) == 0)
+					{
 						bool = true;
 					}
 				}
 				// if the node has been created
-				if (bool) {
+				if (bool)
+				{
+//					/**
+//					 * modified by hengxin(hengxin0912@gmail.com)
+//					 */
+//					CheckerInfo.getInstance().removeNodeFromTable(newnode);
+					
 					continue;
-				} else {
-					//output the lattice constructor procedure information
-					try {
+				} else
+				{
+					// output the lattice constructor procedure information
+					try
+					{
 						out.print("inside created new node: ");
-						for (int m = 0; m < dimension; m++) {
-							String end = m + 1 != dimension ? " "
-									: "\r\n";
+						for (int m = 0; m < dimension; m++)
+						{
+							String end = m + 1 != dimension ? " " : "\r\n";
 							out.print(newnode.getID()[m] + end);
 						}
 						out.flush();
-					} catch (Exception e) {
+					} catch (Exception e)
+					{
 						e.printStackTrace();
 					}
-					
+
 					cur_node.previous.add(newnode);
 					newnode.next.add(cur_node);
-					// 
-					for (int j = 0; j < cur_node.previous.size() - 1; j++) {
+
+					// store the new node into the hash table
+					CheckerInfo.getInstance().storeNode2Table(newnode);
+					
+					// output to .dot file
+					
+					if (CheckerInfo.DOT)
+					{
+						LatticeDot.getInstance().write2LatticeDotLink(newnode,
+								cur_node, false);
+					}
+					
+					for (int j = 0; j < cur_node.previous.size() - 1; j++)
+					{
 						AbstractLatticeNode pnode = cur_node.previous.get(j);
-						for (int k = 0; k < pnode.previous.size(); k++) {
+						for (int k = 0; k < pnode.previous.size(); k++)
+						{
 							AbstractLatticeNode ppnode = pnode.previous.get(k);
-							if (compare(ppnode, newnode) == 1) {
+							if (compare(ppnode, newnode) == 1)
+							{
 								ppnode.next.add(newnode);
 								newnode.previous.add(ppnode);
+
+								if (CheckerInfo.DOT)
+								{
+									// output to .dot file
+									LatticeDot.getInstance()
+											.write2LatticeDotLink(ppnode,
+													newnode, false);
+								}
 							}
 						}
 					}
@@ -378,12 +472,82 @@ public abstract class LatticeChecker extends AbstractFIFOChecker {
 		}
 	}
 
+	/**
+	 * processing non-lattice node explicitly
+	 * 
+	 * added by hengxin(hengxin0912@gmail.com)
+	 * 
+	 * @param fail2RollPid pid of process whose local state cannot be rolled back
+	 * @param fail2RollIndex index of local state which cannot be rolled back 
+	 */
+	private void handleNonNode(AbstractLatticeNode aln,int fail2RollPid, int fail2RollIndex)
+	{
+		// id of non-lattice node
+		String nonNodeIdLiteral = null;
+		String nonNodeId[] = new String[this.dimension];
+		String alnNodeId[] = aln.getID();
+		for(int pid = 0; pid < this.dimension; pid++)
+		{
+			if(pid != fail2RollPid)
+				nonNodeId[pid] = alnNodeId[pid];
+		}
+
+		int length = stateSet.get(fail2RollPid).size();
+		for(int index = fail2RollIndex; index < length; index++)
+		{
+			// each state with such id is not a lattice node
+			nonNodeId[fail2RollPid] = String.valueOf(length - 1 - index);
+			
+			StringBuilder sb = new StringBuilder();
+			
+			for(String localId : nonNodeId)
+			{
+				sb.append(localId).append('_');
+			}
+			nonNodeIdLiteral = sb.toString();
+			
+			if (CheckerInfo.DOT)
+			{
+				// for .dot
+				if (!LatticeDot.getInstance().isDefinedVirtualNode(
+						nonNodeIdLiteral))
+				{
+					LatticeDot.getInstance().write2LatticeDotVirtualNode(
+							nonNodeIdLiteral);
+					LatticeDot.getInstance().add2DefinedVirtualNode(
+							nonNodeIdLiteral);
+				}
+			}
+			
+			if(index == fail2RollIndex)
+			{
+				if (CheckerInfo.DOT)
+				{
+					LatticeDot.getInstance().write2LatticeDotVirtualLink(
+							nonNodeIdLiteral, aln);
+				}
+			}
+			
+			this.handleNonLatticeNode(nonNodeId);
+		}
+	}
+
 	public abstract AbstractLatticeNode createNode(LocalState[] globalState,
 			String[] s);
 
 	public abstract void check(AbstractLatticeNode startNode,
 			AbstractLatticeNode currentNode);
 
+	public void handleLatticeNode(String[] id)
+	{
+		
+	}
+
+	public void handleNonLatticeNode(String[] id)
+	{
+		
+	}
+	
     public LocalState[] getGlobalState() {
         return globalState;
     }

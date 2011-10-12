@@ -37,13 +37,16 @@ public class ExponentRfidData {
         
         int timeGap = 200;
         String concernedTag = "tag_00001";
-        String outputFile = "data/RFID_temp";
-        String outputFile_1 = "data/RFID_1_temp";
+//        String outputFile = "data/RFID_temp";
+//        String outputFile_1 = "data/RFID_1_temp";
+        String outputFile = "data/RFID";
+        String outputFile_1 = "data/RFID_1";
+        
         PrintWriter output = null;
         PrintWriter output_1 = null;
-        double intervalLambda = 1.0 / 55;
+        double intervalLambda = 1.0 / 25;
         double intervalGapLambda = 1.0 / 5;
-        
+        int count = 200;
         
         tags.add(concernedTag);
         
@@ -60,7 +63,7 @@ public class ExponentRfidData {
                 output_1.println(tags.get(i));
             }
             for(int i = 0; i < tags.size(); i++) {
-                int count = 2000;
+
                 String stream = "";
                 for(int j = 0; j < count; j++) {
                     double gapLength = ExponentDistribution.exponent(intervalGapLambda);

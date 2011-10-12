@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import net.sourceforge.mipa.components.rm.ResourceManager;
 import net.sourceforge.mipa.naming.Catalog;
 import net.sourceforge.mipa.naming.IDManager;
@@ -52,6 +54,8 @@ class PredicateInfo {
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
 public class GroupManager {
+	
+	private static Logger logger = Logger.getLogger(GroupManager.class);
 
     // private ContextModeling modeling;
 
@@ -105,16 +109,32 @@ public class GroupManager {
         info.predicateID = predicateID;
         predicates.put(predicateID, info);
         
+        // add logger for this method
         if (DEBUG) {
         	System.out.println("predicates info:");
+        	logger.info("Predicates info:");
+        	
         	PredicateInfo pInfo = predicates.get(predicateID);
         	System.out.println("\tpredicate id: " + pInfo.predicateID);
         	System.out.println("\tcheckers:");
+        	
+        	logger.info("Predicate id is: " + pInfo.predicateID);
+        	logger.info("Checkers:");
+        	
         	for(int i = 0; i < pInfo.checkers.size(); i++) 
+        	{
         		System.out.println("\t\t" + pInfo.checkers.get(i));
+        		logger.info(pInfo.checkers.get(i));
+        	}
+        	
         	System.out.println("\tnormal processes:");
+        	logger.info("Normal processes:");
+        	
         	for(int i = 0; i < pInfo.normalProcesses.size(); i++)
+        	{
         		System.out.println("\t\t" + pInfo.normalProcesses.get(i));
+        		logger.info(pInfo.normalProcesses.get(i));
+        	}
         }
         
         if (EXPERIMENT) {
@@ -131,7 +151,7 @@ public class GroupManager {
         Structure CGSsNode = structure.get(0);
         Structure GSENode = structure.get(1);
         Structure groupNode;
-        if (predicateType.equals(PredicateType.SEQUENCE)) {
+        if (predicateType.equals(PredicateType.SEQUENCE)  || predicateType.equals(PredicateType.CTL)) {
             Structure GSE = new Composite(NodeType.GSE,"GSE");
             Structure CGS = new Composite(NodeType.CGS,"CGS");
             GSE.add(CGS);
@@ -194,9 +214,12 @@ public class GroupManager {
 
         if (DEBUG) {
             System.out.println("Groups inforamtion: ");
+            logger.info("Groups information:");
             for (String str : groups.keySet()) {
                 AbstractGroup g = groups.get(str);
                 System.out.println("\t" + str + " : " + g.getLevel() + " , "
+                        + g.getFather());
+                logger.info(str + " : " + g.getLevel() + " , "
                         + g.getFather());
             }
         }
@@ -324,6 +347,11 @@ public class GroupManager {
             allocateAsSequence(groups, groupToChecker,
                     localPredicateToNormalProcess, callback, predicateID, maxLevel);
             break;
+        //TODO: for ctl predicate
+        case CTL:
+        	allocateAsCTL(groups,groupToChecker,
+        			localPredicateToNormalProcess, callback, predicateID, maxLevel);
+        	break;
         default:
             System.out
                     .println("This predicate type have not been implemented yet.");
@@ -344,12 +372,77 @@ public class GroupManager {
         return info;
     }
 
-    private void allocateAsSequence(Map<String, AbstractGroup> groups,
+    private void allocateAsCTL(Map<String, AbstractGroup> groups,
+			Map<String, String> groupToChecker,
+			Map<LocalPredicate, String> localPredicateToNormalProcess,
+			String callback, String predicateID, int maxLevel)
+	{
+		// TODO need be verified ?
+    	
+    	IDManager idManager = MIPAResource.getIDManager();
+        Coordinator coordinator = MIPAResource.getCoordinator();
+
+        // start checker for level > 0
+        for (int i = maxLevel; i > 0; i--) {
+
+        }
+
+        // check the level == 0
+        for (String s : groups.keySet()) {
+            AbstractGroup g = groups.get(s);
+            if (g.getLevel() == 0) {
+                String gid = g.getGroupId();
+
+                // current Implementation is that father of sequence checker is null;
+
+                ArrayList<Object> children = g.getChildren();
+                ArrayList<String> owners = new ArrayList<String>();
+                ArrayList<String> members = new ArrayList<String>();
+                owners.add(groupToChecker.get(gid));
+                for (int i = 0; i < children.size(); i++) {
+                    members.add(localPredicateToNormalProcess.get(children
+                            .get(i)));
+                }
+                // create group
+                String groupId = null;
+                try {
+                    groupId = idManager.getID(Catalog.Group);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                Group ng = new Group(groupId, owners, members,
+                        PredicateType.CTL);
+                ng.setCoordinatorID(groupId);
+
+                try {
+                    coordinator.newCoordinator(ng);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                String checkerName = ng.getOwners().get(0);
+                String[] normalProcesses = new String[ng.getMembers().size()];
+                ng.getMembers().toArray(normalProcesses);
+                CheckerFactory.createCTLChecker(callback, predicateID, checkerName,
+                        normalProcesses, specification);
+
+                // create Normal Processes.
+                for (int i = 0; i < children.size(); i++) {
+                    broker.registerLocalPredicate((LocalPredicate) children
+                            .get(i), localPredicateToNormalProcess.get(children
+                            .get(i)), ng);
+                }
+            }
+        }
+	}
+
+	private void allocateAsSequence(Map<String, AbstractGroup> groups,
             Map<String, String> groupToChecker,
             Map<LocalPredicate, String> localPredicateToNormalProcess,
             String callback, String predicateID, int maxLevel) {
-        // TODO Auto-generated method stub
-        IDManager idManager = MIPAResource.getIDManager();
+
+    	IDManager idManager = MIPAResource.getIDManager();
         Coordinator coordinator = MIPAResource.getCoordinator();
 
         // start checker for level > 0

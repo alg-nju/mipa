@@ -19,5 +19,31 @@ public class Formula extends Composite  {
         return connetor;
     }
 
-    
+    /**
+     * literal of ctl formulae
+     * added by hengxin(hengxin0912@gmail.com)
+     */
+    @Override
+    public String toString()
+    {
+    	StringBuilder sb = new StringBuilder();
+    	
+    	if (this.connetor != null)
+		{
+			NodeType operator = this.connetor.getOperator();
+			if (operator == NodeType.EU)
+				sb.append("E(").append(this.getChildren().get(0)).append(" U ")
+						.append(this.getChildren().get(1)).append(")");
+			else if (operator == NodeType.AU)
+				sb.append("A(").append(this.getChildren().get(0)).append(" U ")
+						.append(this.getChildren().get(1)).append(")");
+			else
+				sb.append(operator.toString())
+						.append(this.getChildren().get(0));
+		}
+    	else  // recursively ?
+    		sb.append(this.getNodeName());
+    	
+		return sb.toString();
+    }
 }

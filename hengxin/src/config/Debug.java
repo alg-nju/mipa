@@ -25,5 +25,6 @@ package config;
  * @author Jianping Yu <jianp.yue@gmail.com>
  */
 public class Debug {
-    public final static boolean DEBUG = true;
+//    public final static boolean DEBUG = true;
+	public final static boolean DEBUG = false;
 }

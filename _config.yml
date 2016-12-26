@@ -1,0 +1,8 @@
+title: MIPA
+description: Middleware Infrastructure for Predicate Detection in Asynchronous Environments
+google_analytics: UA-42964165-1
+show_downloads: true
+theme: jekyll-theme-slate
+
+gems:
+  - jekyll-mentions
